@@ -54,7 +54,7 @@ class MainController extends GetxController
   late final disableLikeMsg = Pref.disableLikeMsg;
   late DynamicBadgeMode msgBadgeMode = Pref.msgBadgeMode;
   late Set<MsgUnReadType> msgUnReadTypes = Pref.msgUnReadTypeV2;
-  late final RxnString msgUnReadCount = RxnString(null);
+  late final RxString msgUnReadCount = RxString(null);
   late int lastCheckUnreadAt = 0;
 
   final enableMYBar = Pref.enableMYBar;
@@ -314,7 +314,7 @@ class MainController extends GetxController
           () => switch (currentNav) {
             .home => homeController.showRefresh(),
             .dynamics => dynamicController.showRefresh(),
-            .mine => null,
+            .history || .mine => null,
           },
         );
       } else {
