@@ -18,9 +18,10 @@ import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
 
 class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key, this.type});
+  const HistoryPage({super.key, this.type, this.isTab = false});
 
   final String? type;
+  final bool isTab;
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
@@ -157,6 +158,7 @@ class _HistoryPageState extends State<HistoryPage>
   }
 
   AppBar get _buildAppBar => AppBar(
+    automaticallyImplyLeading: !widget.isTab,
     title: const Text('观看记录'),
     actions: [
       IconButton(
@@ -286,10 +288,9 @@ class _HistoryPageState extends State<HistoryPage>
         ),
       );
     }
-
     return null;
   }
 
   @override
-  bool get wantKeepAlive => widget.type != null;
+  bool get wantKeepAlive => widget.type != null || widget.isTab;
 }
