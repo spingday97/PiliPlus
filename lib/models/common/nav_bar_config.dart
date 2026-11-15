@@ -21,8 +21,8 @@ enum NavigationBarType implements EnumWithLabel {
   ),
   history(
     '历史',
-    Icon(Icons.history_outlined),
-    Icon(Icons.history),
+    Icon(Icons.watch_later_outlined),
+    Icon(Icons.watch_later),
     HistoryPage(isTab: true),
   ),
   mine(
