@@ -54,7 +54,7 @@ class MainController extends GetxController
   late final disableLikeMsg = Pref.disableLikeMsg;
   late DynamicBadgeMode msgBadgeMode = Pref.msgBadgeMode;
   late Set<MsgUnReadType> msgUnReadTypes = Pref.msgUnReadTypeV2;
-  late final RxString msgUnReadCount = RxString(null);
+  late final RxnString msgUnReadCount = RxnString();
   late int lastCheckUnreadAt = 0;
 
   final enableMYBar = Pref.enableMYBar;
