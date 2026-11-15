@@ -1,765 +1,422 @@
-import 'dart:async';
 import 'dart:io';
 
-import 'package:PiliPlus/common/assets.dart';
 import 'package:PiliPlus/common/style.dart';
-import 'package:PiliPlus/common/widgets/flutter/list_tile.dart';
-import 'package:PiliPlus/common/widgets/flutter/refresh_indicator.dart';
+import 'package:PiliPlus/common/widgets/floating_navigation_bar.dart';
+import 'package:PiliPlus/common/widgets/flutter/pop_scope.dart';
 import 'package:PiliPlus/common/widgets/image/network_img_layer.dart';
-import 'package:PiliPlus/http/loading_state.dart';
-import 'package:PiliPlus/models/common/mine_tab_type.dart';
+import 'package:PiliPlus/common/widgets/main_layout.dart';
+import 'package:PiliPlus/common/widgets/route_aware_mixin.dart';
 import 'package:PiliPlus/models/common/nav_bar_config.dart';
-import 'package:PiliPlus/pages/common/common_page.dart';
 import 'package:PiliPlus/pages/home/view.dart';
-import 'package:PiliPlus/pages/login/controller.dart';
 import 'package:PiliPlus/pages/main/controller.dart';
-import 'package:PiliPlus/pages/mine/controller.dart';
-import 'package:PiliPlus/pages/mine/widgets/fav_item.dart';
-import 'package:PiliPlus/pages/mine/widgets/history_item.dart';
-import 'package:PiliPlus/pages/mine/widgets/later_item.dart';
-import 'package:PiliPlus/pages/mine/widgets/sub_item.dart';
-import 'package:PiliPlus/utils/bili_utils.dart';
-import 'package:PiliPlus/utils/extension/get_ext.dart';
-import 'package:PiliPlus/utils/extension/num_ext.dart';
+import 'package:PiliPlus/utils/android/bindings.g.dart';
+import 'package:PiliPlus/utils/app_scheme.dart';
+import 'package:PiliPlus/utils/desktop/tray_controller.dart';
+import 'package:PiliPlus/utils/desktop/window_controller.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
+import 'package:PiliPlus/utils/mobile_observer.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:material_ui/material_ui.dart' hide ListTile;
+import 'package:material_ui/material_ui.dart';
+import 'package:nativeapi/nativeapi.dart' as nativeapi;
 
-class MinePage extends StatefulWidget {
-  const MinePage({super.key, this.showBackBtn = false});
-
-  final bool showBackBtn;
+class MainApp extends StatefulWidget {
+  const MainApp({super.key});
 
   @override
-  State<MinePage> createState() => _MediaPageState();
+  State<MainApp> createState() => _MainAppState();
 }
 
-class _MediaPageState extends CommonPageState<MinePage>
-    with AutomaticKeepAliveClientMixin {
-  static const String _customBgKey = 'mineCustomBgPath';
-
-  final MineController controller = Get.putOrFind(MineController.new);
-  late final MainController _mainController = Get.find<MainController>();
-  late ThemeData theme;
-  String? _customBgPath;
+class _MainAppState extends PopScopeState<MainApp>
+    with RouteAware, RouteAwareMixin, WidgetsBindingObserver {
+  final _mainController = Get.put(MainController());
+  late EdgeInsets _padding;
+  late ColorScheme _colorScheme;
+  Brightness? _brightness;
 
   @override
-  bool get wantKeepAlive => true;
-
-  bool get checkPage =>
-      _mainController.navigationBars[0] != NavigationBarType.mine &&
-      _mainController.selectedIndex.value == 0;
+  bool get initCanPop => false;
 
   @override
   void initState() {
     super.initState();
-    final savedPath = GStorage.setting.get(_customBgKey) as String?;
-    if (savedPath != null && File(savedPath).existsSync()) {
-      _customBgPath = savedPath;
+    addObserverMobile(this);
+    if (Platform.isMacOS) {
+      HardwareKeyboard.instance.addHandler(_handleKeyEvent);
     }
-  }
-
-  @override
-  bool onNotificationType1(UserScrollNotification notification) {
-    if (checkPage) {
-      return false;
+    if (PlatformUtils.isDesktop) {
+      WindowController.instance.init();
+      TrayController.instance.init();
     }
-    return super.onNotificationType1(notification);
-  }
-
-  @override
-  bool onNotificationType2(ScrollNotification notification) {
-    if (checkPage) {
-      return false;
+    if (!Platform.isMacOS) {
+      PiliScheme.init();
     }
-    return super.onNotificationType2(notification);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    theme = Theme.of(context);
-  }
-
-  Future<void> _pickCustomBg() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked == null) return;
-    String finalPath = picked.path;
-    final settingPath = GStorage.setting.path;
-    if (settingPath != null) {
-      final dir = File(settingPath).parent;
-      final ext = picked.path.contains('.')
-          ? picked.path.split('.').last
-          : 'img';
-      final target = File(
-        '${dir.path}/mine_custom_bg_${DateTime.now().millisecondsSinceEpoch}.$ext',
-      );
-      await File(picked.path).copy(target.path);
-      finalPath = target.path;
+    _padding = MediaQuery.viewPaddingOf(context);
+    _colorScheme = ColorScheme.of(context);
+    final brightness = _colorScheme.brightness;
+    NetworkImgLayer.reduce =
+        NetworkImgLayer.reduceLuxColor != null && brightness.isDark;
+    if (PlatformUtils.isDesktop) {
+      if (_brightness != brightness) {
+        _brightness = brightness;
+        nativeapi.Application.instance.setBrightness(
+          brightness == .dark ? .dark : .light,
+        );
+      }
     }
-    final oldPath = _customBgPath;
-    if (oldPath != null && oldPath != finalPath) {
-      try {
-        final oldFile = File(oldPath);
-        if (oldFile.existsSync()) {
-          await oldFile.delete();
-        }
-      } catch (_) {}
-    }
-    await GStorage.setting.put(_customBgKey, finalPath);
-    if (mounted) {
-      setState(() {
-        _customBgPath = finalPath;
-      });
-    }
-  }
-
-  Future<void> _resetCustomBg() async {
-    final oldPath = _customBgPath;
-    if (oldPath != null) {
-      try {
-        final oldFile = File(oldPath);
-        if (oldFile.existsSync()) {
-          await oldFile.delete();
-        }
-      } catch (_) {}
-    }
-    await GStorage.setting.delete(_customBgKey);
-    if (mounted) {
-      setState(() {
-        _customBgPath = null;
-      });
+    if (!_mainController.useSideBar) {
+      _mainController.useBottomNav = MediaQuery.isPortraitOf(context);
     }
   }
 
   @override
+  void didPopNext() {
+    addObserverMobile(this);
+    _mainController
+      ..checkUnreadDynamic()
+      ..checkDefaultSearch(true)
+      ..checkUnread(_mainController.useBottomNav);
+    super.didPopNext();
+  }
+
+  @override
+  void didPushNext() {
+    removeObserverMobile(this);
+    super.didPushNext();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _mainController
+        ..checkUnreadDynamic()
+        ..checkDefaultSearch(true)
+        ..checkUnread(_mainController.useBottomNav);
+    }
+  }
+
+  @override
+  void dispose() {
+    if (Platform.isMacOS) {
+      HardwareKeyboard.instance.removeHandler(_handleKeyEvent);
+    }
+    if (PlatformUtils.isDesktop) {
+      WindowController.instance.dispose();
+      TrayController.instance.dispose();
+    }
+    removeObserverMobile(this);
+    PiliScheme.listener?.cancel();
+    GStorage.close();
+    super.dispose();
+  }
+
+  bool _handleKeyEvent(KeyEvent event) {
+    return event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.keyR &&
+        HardwareKeyboard.instance.isMetaPressed &&
+        _mainController.refreshRecommendations();
+  }
+
+  @pragma('vm:prefer-inline')
+  static void _onBack() {
+    if (Platform.isAndroid) {
+      AndroidHelper.back();
+    }
+  }
+
+  @override
+  void onPopInvokedWithResult(bool didPop, Object? result) {
+    if (_mainController.directExitOnBack) {
+      _onBack();
+    } else {
+      if (_mainController.selectedIndex.value != 0) {
+        _mainController
+          ..setIndex(0)
+          ..barOffset?.value = 0.0
+          ..showBottomBar?.value = true
+          ..setSearchBar();
+      } else {
+        _onBack();
+      }
+    }
+  }
+
+  Widget? get _bottomNav {
+    Widget? bottomNav;
+    if (_mainController.navigationBars.length > 1) {
+      if (_mainController.floatingNavBar) {
+        bottomNav = Obx(
+          () => FloatingNavigationBar(
+            onDestinationSelected: _mainController.setIndex,
+            selectedIndex: _mainController.selectedIndex.value,
+            destinations: _mainController.navigationBars
+                .map(
+                  (e) => FloatingNavigationDestination(
+                    label: e.label,
+                    icon: _buildIcon(type: e),
+                    selectedIcon: _buildIcon(type: e, selected: true),
+                  ),
+                )
+                .toList(),
+          ),
+        );
+      } else if (_mainController.enableMYBar) {
+        bottomNav = Obx(
+          () => NavigationBar(
+            maintainBottomViewPadding: true,
+            onDestinationSelected: _mainController.setIndex,
+            selectedIndex: _mainController.selectedIndex.value,
+            destinations: _mainController.navigationBars
+                .map(
+                  (e) => NavigationDestination(
+                    label: e.label,
+                    icon: _buildIcon(type: e),
+                    selectedIcon: _buildIcon(type: e, selected: true),
+                  ),
+                )
+                .toList(),
+          ),
+        );
+      } else {
+        bottomNav = Obx(
+          () => BottomNavigationBar(
+            currentIndex: _mainController.selectedIndex.value,
+            onTap: _mainController.setIndex,
+            iconSize: 16,
+            selectedFontSize: 12,
+            unselectedFontSize: 12,
+            type: .fixed,
+            items: _mainController.navigationBars
+                .map(
+                  (e) => BottomNavigationBarItem(
+                    label: e.label,
+                    icon: _buildIcon(type: e),
+                    activeIcon: _buildIcon(type: e, selected: true),
+                  ),
+                )
+                .toList(),
+          ),
+        );
+      }
+
+      if (_mainController.hideBottomBar) {
+        if (_mainController.barOffset case final barOffset?) {
+          return Obx(
+            () => FractionalTranslation(
+              translation: Offset(
+                0.0,
+                barOffset.value / Style.topBarHeight,
+              ),
+              child: bottomNav,
+            ),
+          );
+        }
+        if (_mainController.showBottomBar case final showBottomBar?) {
+          return Obx(
+            () => AnimatedSlide(
+              curve: Curves.easeInOutCubicEmphasized,
+              duration: const Duration(milliseconds: 500),
+              offset: Offset(0, showBottomBar.value ? 0 : 1),
+              child: bottomNav,
+            ),
+          );
+        }
+      }
+    }
+
+    return bottomNav;
+  }
+
+  Widget _sideBar() {
+    if (_mainController.navigationBars.length > 1) {
+      if (MediaQuery.isTabletOf(context) && _mainController.optTabletNav) {
+        return Padding(
+          padding: const .only(top: 25),
+          child: MediaQuery.removePadding(
+            context: context,
+            removeRight: true,
+            child: Obx(
+              () => DrawerTheme(
+                data: DrawerThemeData(
+                  width:
+                      (_mainController.hideSideBarLabel ? 80 : 130) +
+                      _padding.left,
+                ),
+                child: NavigationDrawer(
+                  /// apply `lib/scripts/navigation_drawer.patch`
+                  flex: 5,
+                  backgroundColor: Colors.transparent,
+                  onDestinationSelected: _mainController.setIndex,
+                  selectedIndex: _mainController.selectedIndex.value,
+                  header: Expanded(flex: 4, child: userAndSearchVertical()),
+                  tilePadding: const .symmetric(vertical: 5, horizontal: 12),
+                  indicatorShape: _mainController.hideSideBarLabel
+                      ? const RoundedRectangleBorder(
+                          borderRadius: .all(.circular(12)),
+                        )
+                      : const RoundedRectangleBorder(
+                          borderRadius: .all(.circular(16)),
+                        ),
+                  children: _mainController.navigationBars
+                      .map(
+                        (e) => NavigationDrawerDestination(
+                          label: _mainController.hideSideBarLabel
+                              ? Semantics(
+                                  label: e.label,
+                                  child: const SizedBox.shrink(),
+                                )
+                              : Text(e.label),
+                          icon: _buildIcon(type: e),
+                          selectedIcon: _buildIcon(
+                            type: e,
+                            selected: true,
+                          ),
+                        ),
+                      )
+                      .toList(),
+                ),
+              ),
+            ),
+          ),
+        );
+      }
+      return Obx(
+        () => NavigationRail(
+          groupAlignment: 0.5,
+          labelType: _mainController.hideSideBarLabel ? .none : .selected,
+          leading: userAndSearchVertical(),
+          backgroundColor: Colors.transparent,
+          onDestinationSelected: _mainController.setIndex,
+          selectedIndex: _mainController.selectedIndex.value,
+          destinations: _mainController.navigationBars
+              .map(
+                (e) => NavigationRailDestination(
+                  label: Text(e.label),
+                  icon: _buildIcon(type: e),
+                  selectedIcon: _buildIcon(type: e, selected: true),
+                ),
+              )
+              .toList(),
+        ),
+      );
+    }
+    return Container(
+      width: 80,
+      margin: .only(top: 12 + _padding.top, left: _padding.left),
+      child: userAndSearchVertical(),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    super.build(context);
-    final secondary = theme.colorScheme.secondary;
-    final topPadding = MediaQuery.paddingOf(context).top;
-    return Stack(
-      children: [
-        MediaQuery.removePadding(
+    Widget child;
+    if (_mainController.mainTabBarView) {
+      child = TabBarView(
+        controller: _mainController.controller,
+        physics: const NeverScrollableScrollPhysics(),
+        scrollDirection: _mainController.useBottomNav ? .horizontal : .vertical,
+        children: _mainController.navigationBars.map((i) => i.page).toList(),
+      );
+    } else {
+      child = PageView(
+        controller: _mainController.controller,
+        physics: const NeverScrollableScrollPhysics(),
+        children: _mainController.navigationBars.map((i) => i.page).toList(),
+      );
+    }
+
+    Widget? sideBar;
+    Widget? bottomNav;
+    final EdgeInsets padding;
+    if (_mainController.useBottomNav) {
+      bottomNav = _bottomNav;
+      if (bottomNav != null) {
+        bottomNav = MediaQuery.removePadding(
           context: context,
           removeTop: true,
-          child: Material(
-            type: .transparency,
-            child: refreshIndicator(
-              onRefresh: controller.onRefresh,
-              child: onBuild(
-                ListView(
-                  padding: const .only(bottom: 150),
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  children: [
-                    _buildTopBannerAndUser(theme, secondary, topPadding),
-                    _buildUserStatsRow(theme, secondary),
-                    _buildActions(secondary),
-                    for (final tab in controller.mineTabs)
-                      switch (tab) {
-                        .favorite => Obx(_buildFav),
-                        .history => Obx(_buildHistory),
-                        .later => Obx(_buildLater),
-                        .sub => Obx(_buildSub),
-                      },
-                  ],
-                ),
-              ),
+          child: bottomNav,
+        );
+      }
+      padding = _padding.copyWith(bottom: 0);
+    } else {
+      sideBar = DecoratedBox(
+        decoration: BoxDecoration(
+          border: Border(
+            right: BorderSide(
+              color: _colorScheme.outline.withValues(alpha: 0.06),
             ),
           ),
         ),
-        if (widget.showBackBtn)
-          Positioned(
-            top: topPadding + 8,
-            left: 12,
-            child: Material(
-              color: theme.colorScheme.surface.withValues(alpha: 0.78),
-              shape: const CircleBorder(),
-              child: const BackButton(),
-            ),
-          ),
-        Positioned(
-          top: topPadding + 8,
-          right: 16,
-          child: _buildSingleMenuButton(theme),
-        ),
-      ],
-    );
-  }
+        child: _sideBar(),
+      );
+      padding = .only(top: _padding.top, right: _padding.right);
+    }
 
-  Widget _buildTopBannerAndUser(
-    ThemeData theme,
-    Color secondary,
-    double topPadding,
-  ) {
-    final bgColor = theme.scaffoldBackgroundColor;
-    final customPath = _customBgPath;
-    final hasCustomBg = customPath != null && File(customPath).existsSync();
-    if (!hasCustomBg) {
-      return Padding(
-        padding: EdgeInsets.only(top: topPadding + 56, bottom: 4),
-        child: _buildUserIdentityRow(theme, secondary),
+    child = Material(
+      child: MainLayout(
+        sideBar: sideBar,
+        bottomNav: bottomNav,
+        body: Padding(padding: padding, child: child),
+      ),
+    );
+
+    if (PlatformUtils.isMobile) {
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarBrightness: _colorScheme.brightness,
+          statusBarIconBrightness: _colorScheme.brightness.reverse,
+          systemStatusBarContrastEnforced: false,
+          systemNavigationBarColor: Colors.transparent,
+          systemNavigationBarIconBrightness: _colorScheme.brightness.reverse,
+        ),
+        child: child,
       );
     }
-    return Stack(
-      children: [
-        Image.file(
-          File(customPath),
-          width: double.infinity,
-          fit: BoxFit.fitWidth,
-          errorBuilder: (_, _, _) => SizedBox(height: topPadding + 120),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 0,
-          height: 150,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                stops: const [0.0, 0.55, 1.0],
-                colors: [
-                  bgColor.withValues(alpha: 0.0),
-                  bgColor.withValues(alpha: 0.85),
-                  bgColor,
-                ],
-              ),
-            ),
-          ),
-        ),
-        Positioned(
-          left: 0,
-          right: 0,
-          bottom: 4,
-          child: _buildUserIdentityRow(theme, secondary),
-        ),
-      ],
-    );
+
+    return child;
   }
 
-  Widget _buildSingleMenuButton(ThemeData theme) {
-    return Material(
-      color: theme.colorScheme.surface.withValues(alpha: 0.78),
-      shape: const CircleBorder(),
-      child: PopupMenuButton<String>(
-        tooltip: '更多操作',
-        icon: const Icon(Icons.more_horiz, size: 22),
-        onSelected: (value) {
-          switch (value) {
-            case 'search':
-              Get.toNamed('/search');
-            case 'reply':
-              Get.toNamed('/myReply');
-            case 'anonymity':
-              MineController.onChangeAnonymity();
-            case 'switch_account':
-              LoginPageController.switchAccountDialog(context);
-            case 'theme':
-              controller.onChangeTheme();
-            case 'pick_bg':
-              _pickCustomBg();
-            case 'reset_bg':
-              _resetCustomBg();
-            case 'setting':
-              Get.toNamed('/setting', preventDuplicates: false);
-          }
-        },
-        itemBuilder: (_) => [
-          if (!_mainController.hasHome)
-            const PopupMenuItem(
-              value: 'search',
-              child: Row(
-                spacing: 10,
-                children: [
-                  Icon(Icons.search, size: 20),
-                  Text('搜索'),
-                ],
-              ),
-            ),
-          if (GStorage.reply != null)
-            const PopupMenuItem(
-              value: 'reply',
-              child: Row(
-                spacing: 10,
-                children: [
-                  Icon(Icons.message_outlined, size: 20),
-                  Text('评论记录'),
-                ],
-              ),
-            ),
-          PopupMenuItem(
-            value: 'anonymity',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(
-                  MineController.anonymity.value
-                      ? MdiIcons.incognito
-                      : MdiIcons.incognitoOff,
-                  size: 20,
-                ),
-                Text(MineController.anonymity.value ? '退出无痕模式' : '进入无痕模式'),
-              ],
-            ),
-          ),
-          const PopupMenuItem(
-            value: 'switch_account',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.switch_account_outlined, size: 20),
-                Text('切换账号'),
-              ],
-            ),
-          ),
-          PopupMenuItem(
-            value: 'theme',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(controller.themeType.value.icon.icon, size: 20),
-                Text('切换至${controller.nextThemeType.label}主题'),
-              ],
-            ),
-          ),
-          const PopupMenuItem(
-            value: 'pick_bg',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.wallpaper_outlined, size: 20),
-                Text('自定义背景图'),
-              ],
-            ),
-          ),
-          if (_customBgPath != null)
-            const PopupMenuItem(
-              value: 'reset_bg',
-              child: Row(
-                spacing: 10,
-                children: [
-                  Icon(Icons.restore_outlined, size: 20),
-                  Text('清除背景图'),
-                ],
-              ),
-            ),
-          const PopupMenuItem(
-            value: 'setting',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.settings_outlined, size: 20),
-                Text('设置'),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActions(Color primary) {
-    return Row(
-      mainAxisAlignment: .spaceEvenly,
-      children: controller.list
-          .map(
-            (e) => Flexible(
-              child: InkWell(
-                onTap: e.onTap,
-                borderRadius: Style.mdRadius,
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 80),
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: Column(
-                      spacing: 6,
-                      mainAxisSize: .min,
-                      mainAxisAlignment: .center,
-                      children: [
-                        Icon(e.icon, color: primary),
-                        Text(
-                          e.title,
-                          style: const TextStyle(fontSize: 13),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          )
-          .toList(),
-    );
-  }
-
-  Widget _buildUserIdentityRow(ThemeData theme, Color secondary) {
-    final coinLabelStyle = TextStyle(
-      fontSize: theme.textTheme.labelMedium!.fontSize,
-      color: theme.colorScheme.outline,
-    );
-    final coinValStyle = TextStyle(
-      fontSize: theme.textTheme.labelMedium!.fontSize,
-      fontWeight: FontWeight.bold,
-      color: secondary,
-    );
-    return Obx(() {
-      final userInfo = controller.userInfo.value;
-      final levelInfo = userInfo.levelInfo;
-      final hasLevel = levelInfo != null;
-      final isVip = userInfo.vipStatus != null && userInfo.vipStatus! > 0;
-      return GestureDetector(
-        behavior: .opaque,
-        onTap: controller.onLogin,
-        onLongPress: () {
-          Feedback.forLongPress(context);
-          controller.onLogin(true);
-        },
-        onSecondaryTap: PlatformUtils.isMobile
-            ? null
-            : () => controller.onLogin(true),
-        child: Row(
-          mainAxisSize: .min,
-          children: [
-            const SizedBox(width: 20),
-            userInfo.face != null
-                ? Stack(
-                    clipBehavior: .none,
-                    children: [
-                      NetworkImgLayer(
-                        src: userInfo.face,
-                        type: .avatar,
-                        width: 55,
-                        height: 55,
-                      ),
-                      if (isVip)
-                        Positioned(
-                          right: -1,
-                          bottom: -2,
-                          child: SvgPicture.asset(
-                            Assets.vipIcon,
-                            height: 19,
-                            semanticsLabel: "大会员",
-                          ),
-                        ),
-                    ],
-                  )
-                : ClipOval(
-                    child: Image.asset(
-                      width: 55,
-                      height: 55,
-                      cacheHeight: 55.cacheSize(context),
-                      Assets.avatarPlaceHolder,
-                      semanticsLabel: "默认头像",
-                    ),
-                  ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                mainAxisSize: .min,
-                mainAxisAlignment: .center,
-                crossAxisAlignment: .start,
-                children: [
-                  Row(
-                    spacing: 6,
-                    children: [
-                      Flexible(
-                        child: Text(
-                          userInfo.uname ?? '点击登录',
-                          style: theme.textTheme.titleMedium!.copyWith(
-                            height: 1,
-                            color: isVip && userInfo.vipType == 2
-                                ? theme.colorScheme.vipColor
-                                : null,
-                          ),
-                          maxLines: 1,
-                          overflow: .ellipsis,
-                        ),
-                      ),
-                      BiliUtils.levelPicture(
-                        levelInfo?.currentLevel ?? 0,
-                        isSeniorMember: userInfo.isSeniorMember == 1,
-                        height: 10,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text.rich(
-                    TextSpan(
-                      children: [
-                        TextSpan(
-                          text: '硬币 ',
-                          style: coinLabelStyle,
-                        ),
-                        TextSpan(
-                          text: userInfo.money?.toString() ?? '-',
-                          style: coinValStyle,
-                        ),
-                        TextSpan(
-                          text: "      经验 ",
-                          style: coinLabelStyle,
-                        ),
-                        TextSpan(
-                          text: levelInfo?.currentExp?.toString() ?? '-',
-                          style: coinValStyle,
-                        ),
-                        TextSpan(
-                          text: "/${levelInfo?.nextExp ?? '-'}",
-                          style: coinLabelStyle,
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 225),
-                    child: LinearProgressIndicator(
-                      minHeight: 2.25,
-                      value: hasLevel
-                          ? levelInfo.currentExp! / levelInfo.nextExp!
-                          : 0,
-                      backgroundColor: theme.colorScheme.outline.withValues(
-                        alpha: 0.4,
-                      ),
-                      valueColor: AlwaysStoppedAnimation<Color>(secondary),
-                      stopIndicatorColor: Colors.transparent,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 20),
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget _buildUserStatsRow(ThemeData theme, Color secondary) {
-    final style = TextStyle(
-      fontSize: theme.textTheme.titleMedium!.fontSize,
-      fontWeight: FontWeight.bold,
-    );
-    final labelStyle = theme.textTheme.labelMedium!.copyWith(
-      color: theme.colorScheme.outline,
-    );
-    return Obx(() {
-      final userStat = controller.userStat.value;
-      return Padding(
-        padding: const EdgeInsets.only(top: 6),
-        child: Row(
-          mainAxisAlignment: .spaceEvenly,
-          children: [
-            _btn(
-              count: userStat.dynamicCount,
-              countStyle: style,
-              name: '动态',
-              labelStyle: labelStyle,
-              onTap: () => controller.push('memberDynamics'),
-            ),
-            _btn(
-              count: userStat.following,
-              countStyle: style,
-              name: '关注',
-              labelStyle: labelStyle,
-              onTap: () => controller.push('follow'),
-            ),
-            _btn(
-              count: userStat.follower,
-              countStyle: style,
-              name: '粉丝',
-              labelStyle: labelStyle,
-              onTap: () => controller.push('fan'),
-            ),
-          ],
-        ),
-      );
-    });
-  }
-
-  Widget _btn({
-    required int? count,
-    required TextStyle countStyle,
-    required String name,
-    required TextStyle? labelStyle,
-    required VoidCallback onTap,
-  }) {
-    return Flexible(
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: Style.mdRadius,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 80),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: Column(
-              spacing: 4,
-              mainAxisSize: .min,
-              mainAxisAlignment: .center,
-              children: [
-                Text(
-                  count?.toString() ?? '-',
-                  style: countStyle,
-                ),
-                Text(
-                  name,
-                  style: labelStyle,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _autoRefresh(MineRefreshMixin tabCtr) => Timer(
-    const Duration(milliseconds: 150),
-    () => tabCtr.onRefresh(isManual: false),
-  );
-
-  Widget _buildFav() {
-    return _buildTab(
-      .favorite,
-      controller.favCtr!,
-      itemBuilder: (element) => FavFolderItem(
-        item: element,
-        onPop: () => _autoRefresh(controller.favCtr!),
-      ),
-      onPushDetail: () => Get.toNamed(
-        '/fav',
-      )?.whenComplete(() => _autoRefresh(controller.favCtr!)),
-    );
-  }
-
-  Widget _buildHistory() {
-    return _buildTab(
-      .history,
-      controller.historyCtr!,
-      itemBuilder: (element) => MineHistoryItem(
-        item: element,
-        onPop: () => _autoRefresh(controller.historyCtr!),
-      ),
-      onPushDetail: () => Get.toNamed(
-        '/history',
-      )?.whenComplete(() => _autoRefresh(controller.historyCtr!)),
-    );
-  }
-
-  Widget _buildLater() {
-    return _buildTab(
-      .later,
-      controller.laterCtr!,
-      itemBuilder: (element) => MineLaterItem(
-        item: element,
-        onPop: () => _autoRefresh(controller.laterCtr!),
-      ),
-      onPushDetail: () => Get.toNamed(
-        '/later',
-      )?.whenComplete(() => _autoRefresh(controller.laterCtr!)),
-    );
-  }
-
-  Widget _buildSub() {
-    return _buildTab(
-      .sub,
-      controller.subCtr!,
-      itemBuilder: (element) => MineSubItem(
-        item: element,
-        onPop: () => _autoRefresh(controller.subCtr!),
-      ),
-      onPushDetail: () => Get.toNamed(
-        '/subscription',
-      )?.whenComplete(() => _autoRefresh(controller.subCtr!)),
-    );
-  }
-
-  Widget _buildTab<R, T>(
-    MineTabType tab,
-    MineRefreshMixin<R, T> tabCtr, {
-    required Widget Function(T element) itemBuilder,
-    required VoidCallback onPushDetail,
-  }) {
-    final Widget child;
-    switch (tabCtr.loadingState.value) {
-      case Loading():
-        return const SizedBox.shrink();
-      case Success(:final response):
-        if (response == null || response.isEmpty) {
-          return const SizedBox.shrink();
-        }
-        child = SizedBox(
-          height: 180,
-          child: ListView.separated(
-            itemCount: response.length,
-            controller: tabCtr.scrollController,
-            physics: const AlwaysScrollableScrollPhysics(),
-            padding: const .only(left: 20, top: 10, right: 20),
-            itemBuilder: (context, index) {
-              if (index == response.length - 1) {
-                tabCtr.onLoadMore();
-              }
-              return SizedBox(width: 180, child: itemBuilder(response[index]));
+  Widget _buildIcon({required NavigationBarType type, bool selected = false}) {
+    final icon = selected ? type.selectIcon : type.icon;
+    return type == .dynamics
+        ? Obx(
+            () {
+              final dynCount = _mainController.dynCount.value;
+              return Badge(
+                isLabelVisible: dynCount > 0,
+                label: _mainController.dynamicBadgeMode == .number
+                    ? Text(dynCount.toString())
+                    : null,
+                padding: const .symmetric(horizontal: 6),
+                child: icon,
+              );
             },
-            scrollDirection: .horizontal,
-            separatorBuilder: (_, _) => const SizedBox(width: 14),
-          ),
-        );
-      case Error(:final errMsg):
-        if (errMsg == null) return const SizedBox.shrink();
-        child = SizedBox(
-          height: 160,
-          child: Center(child: Text(errMsg, textAlign: .center)),
-        );
-    }
-    final secondary = theme.colorScheme.secondary;
+          )
+        : icon;
+  }
+
+  Widget userAndSearchVertical() {
     return Column(
       children: [
-        Divider(
-          height: 20,
-          color: theme.colorScheme.outline.withValues(alpha: 0.1),
-        ),
-        ListTile(
-          dense: true,
-          onTap: onPushDetail,
-          title: Padding(
-            padding: const EdgeInsets.only(left: 10),
-            child: Text.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: '${tab.label} ',
-                    style: const TextStyle(fontSize: 16, fontWeight: .bold),
-                  ),
-                  if (tabCtr.count != null)
-                    TextSpan(
-                      text: '${tabCtr.count} ',
-                      style: TextStyle(color: secondary),
-                    ),
-                  WidgetSpan(
-                    child: Icon(
-                      Icons.arrow_forward_ios,
-                      size: 18,
-                      color: secondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+        userAvatar(colorScheme: _colorScheme, mainController: _mainController),
+        const SizedBox(height: 8),
+        msgBadge(_mainController),
+        IconButton(
+          tooltip: '搜索',
+          icon: const Icon(
+            Icons.search_outlined,
+            semanticLabel: '搜索',
           ),
-          trailing: IconButton(
-            tooltip: '刷新',
-            onPressed: tabCtr.onRefresh,
-            icon: const Icon(Icons.refresh, size: 20),
-          ),
+          onPressed: () => Get.toNamed('/search'),
         ),
-        child,
       ],
     );
   }
