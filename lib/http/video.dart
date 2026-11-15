@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:math' show Random;
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/grpc/bilibili/main/community/reply/v1.pb.dart'
     show ReplyInfo;
@@ -134,9 +134,28 @@ abstract final class VideoHttp {
   }
 
   // 添加额外的loginState变量模拟未登录状态
+  static String _randomHex(int length) {
+    const chars = '0123456789abcdef';
+    final rng = Random.secure();
+    return List.generate(length, (_) => chars[rng.nextInt(16)]).join();
+  }
+
+  static final String _appSessionId = _randomHex(8);
+
+  static String _stableAppFp() {
+    final cached = GStorage.setting.get('customAppFp') as String?;
+    if (cached != null && cached.length == 64) {
+      return cached;
+    }
+    final generated = _randomHex(64);
+    GStorage.setting.put('customAppFp', generated);
+    return generated;
+  }
+
   static Future<LoadingState<List<RcmdVideoItemAppModel>>> rcmdVideoListApp({
     required int freshIdx,
   }) async {
+    final fp = _stableAppFp();
     final params = {
       'build': 8430300,
       'c_locale': 'zh_CN',
@@ -154,7 +173,7 @@ abstract final class VideoHttp {
       'guidance': 1,
       'https_url_req': 1,
       'idx': freshIdx,
-      'mobi_app': 'android_i',
+      'mobi_app': 'android',
       'network': 'wifi',
       'platform': 'android',
       'player_net': 1,
@@ -172,11 +191,11 @@ abstract final class VideoHttp {
       options: Options(
         headers: {
           'buvid': Accounts.get(.recommend).buvid,
-          'fp_local': '1111111111111111111111111111111111111111111111111111111111111111',
-          'fp_remote': '1111111111111111111111111111111111111111111111111111111111111111',
-          'session_id': '11111111',
+          'fp_local': fp,
+          'fp_remote': fp,
+          'session_id': _appSessionId,
           'env': 'prod',
-          'app-key': 'android_hd',
+          'app-key': 'android',
           'User-Agent': Constants.userAgent,
           'x-bili-trace-id': Constants.traceId,
           'x-bili-aurora-eid': '',
@@ -188,6 +207,7 @@ abstract final class VideoHttp {
     if (res.data['code'] == 0) {
       final list = <RcmdVideoItemAppModel>[];
       for (final i in res.data['data']['items']) {
+
         // 屏蔽推广和拉黑用户
         if (_filterAppRcmd(i)) continue;
         final videoItem = RcmdVideoItemAppModel.fromJson(i);
