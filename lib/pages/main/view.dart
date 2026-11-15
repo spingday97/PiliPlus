@@ -316,39 +316,30 @@ class _MainAppState extends PopScopeState<MainApp>
 
   @override
   Widget build(BuildContext context) {
+    final tabChildren = _mainController.navigationBars
+        .map(
+          (i) => i == NavigationBarType.mine
+              ? i.page
+              : Padding(
+                  padding: EdgeInsets.only(top: _padding.top),
+                  child: i.page,
+                ),
+        )
+        .toList();
+
     Widget child;
     if (_mainController.mainTabBarView) {
       child = TabBarView(
         controller: _mainController.controller,
-        children: _mainController.navigationBars
-    .map(
-      (i) => i == NavigationBarType.mine
-          ? i.page
-          : Padding(
-              padding: EdgeInsets.only(top: _padding.top),
-              child: i.page,
-            ),
-    )
-    .toList(),
-
+        physics: const NeverScrollableScrollPhysics(),
         scrollDirection: _mainController.useBottomNav ? .horizontal : .vertical,
-        children: _mainController.navigationBars.map((i) => i.page).toList(),
+        children: tabChildren,
       );
     } else {
       child = PageView(
         controller: _mainController.controller,
         physics: const NeverScrollableScrollPhysics(),
-children: _mainController.navigationBars
-    .map(
-      (i) => i == NavigationBarType.mine
-          ? i.page
-          : Padding(
-              padding: EdgeInsets.only(top: _padding.top),
-              child: i.page,
-            ),
-    )
-    .toList(),
-
+        children: tabChildren,
       );
     }
 
@@ -364,7 +355,7 @@ children: _mainController.navigationBars
           child: bottomNav,
         );
       }
-padding = _padding.copyWith(top: 0, bottom: 0);
+      padding = _padding.copyWith(top: 0, bottom: 0);
     } else {
       sideBar = DecoratedBox(
         decoration: BoxDecoration(
