@@ -24,6 +24,7 @@ import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
+import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -143,7 +144,9 @@ class _MediaPageState extends CommonPageState<MinePage>
     super.build(context);
     final secondary = theme.colorScheme.secondary;
     final topPadding = MediaQuery.paddingOf(context).top;
-    return Stack(
+    final hasCustomBg =
+        _customBgPath != null && File(_customBgPath!).existsSync();
+    final content = Stack(
       children: [
         MediaQuery.removePadding(
           context: context,
@@ -157,7 +160,12 @@ class _MediaPageState extends CommonPageState<MinePage>
                   padding: const .only(bottom: 150),
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    _buildTopBannerAndUser(theme, secondary, topPadding),
+                    _buildTopBannerAndUser(
+                      theme,
+                      secondary,
+                      topPadding,
+                      hasCustomBg,
+                    ),
                     _buildUserStatsRow(theme, secondary),
                     _buildActions(secondary),
                     for (final tab in controller.mineTabs)
@@ -175,31 +183,41 @@ class _MediaPageState extends CommonPageState<MinePage>
         ),
         if (widget.showBackBtn)
           Positioned(
-            top: topPadding + 8,
-            left: 12,
-            child: Material(
-              color: theme.colorScheme.surface.withValues(alpha: 0.78),
-              shape: const CircleBorder(),
-              child: const BackButton(),
+            top: topPadding + 6,
+            left: 8,
+            child: BackButton(
+              color: hasCustomBg ? Colors.white : null,
             ),
           ),
         Positioned(
-          top: topPadding + 8,
-          right: 16,
-          child: _buildSingleMenuButton(theme),
+          top: topPadding + 6,
+          right: 10,
+          child: _buildSingleMenuButton(theme, hasCustomBg),
         ),
       ],
     );
+
+    if (PlatformUtils.isMobile && hasCustomBg) {
+      return AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
+          systemStatusBarContrastEnforced: false,
+        ),
+        child: content,
+      );
+    }
+    return content;
   }
 
   Widget _buildTopBannerAndUser(
     ThemeData theme,
     Color secondary,
     double topPadding,
+    bool hasCustomBg,
   ) {
     final bgColor = theme.scaffoldBackgroundColor;
-    final customPath = _customBgPath;
-    final hasCustomBg = customPath != null && File(customPath).existsSync();
     if (!hasCustomBg) {
       return Padding(
         padding: EdgeInsets.only(top: topPadding + 56, bottom: 4),
@@ -209,7 +227,7 @@ class _MediaPageState extends CommonPageState<MinePage>
     return Stack(
       children: [
         Image.file(
-          File(customPath),
+          File(_customBgPath!),
           width: double.infinity,
           fit: BoxFit.fitWidth,
           errorBuilder: (_, _, _) => SizedBox(height: topPadding + 120),
@@ -244,124 +262,132 @@ class _MediaPageState extends CommonPageState<MinePage>
     );
   }
 
-  Widget _buildSingleMenuButton(ThemeData theme) {
-    return Material(
-      color: theme.colorScheme.surface.withValues(alpha: 0.78),
-      shape: const CircleBorder(),
-      child: PopupMenuButton<String>(
-        tooltip: '更多操作',
-        icon: const Icon(Icons.more_horiz, size: 22),
-        onSelected: (value) {
-          switch (value) {
-            case 'search':
-              Get.toNamed('/search');
-            case 'reply':
-              Get.toNamed('/myReply');
-            case 'anonymity':
-              MineController.onChangeAnonymity();
-            case 'switch_account':
-              LoginPageController.switchAccountDialog(context);
-            case 'theme':
-              controller.onChangeTheme();
-            case 'pick_bg':
-              _pickCustomBg();
-            case 'reset_bg':
-              _resetCustomBg();
-            case 'setting':
-              Get.toNamed('/setting', preventDuplicates: false);
-          }
-        },
-        itemBuilder: (_) => [
-          if (!_mainController.hasHome)
-            const PopupMenuItem(
-              value: 'search',
-              child: Row(
-                spacing: 10,
-                children: [
-                  Icon(Icons.search, size: 20),
-                  Text('搜索'),
-                ],
-              ),
-            ),
-          if (GStorage.reply != null)
-            const PopupMenuItem(
-              value: 'reply',
-              child: Row(
-                spacing: 10,
-                children: [
-                  Icon(Icons.message_outlined, size: 20),
-                  Text('评论记录'),
-                ],
-              ),
-            ),
-          PopupMenuItem(
-            value: 'anonymity',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(
-                  MineController.anonymity.value
-                      ? MdiIcons.incognito
-                      : MdiIcons.incognitoOff,
-                  size: 20,
+  Widget _buildSingleMenuButton(ThemeData theme, bool hasCustomBg) {
+    return PopupMenuButton<String>(
+      tooltip: '更多操作',
+      icon: Icon(
+        Icons.more_vert,
+        size: 22,
+        color: hasCustomBg ? Colors.white : theme.colorScheme.onSurface,
+        shadows: hasCustomBg
+            ? const [
+                Shadow(
+                  color: Color(0x73000000),
+                  blurRadius: 8,
                 ),
-                Text(MineController.anonymity.value ? '退出无痕模式' : '进入无痕模式'),
-              ],
-            ),
-          ),
-          const PopupMenuItem(
-            value: 'switch_account',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.switch_account_outlined, size: 20),
-                Text('切换账号'),
-              ],
-            ),
-          ),
-          PopupMenuItem(
-            value: 'theme',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(controller.themeType.value.icon.icon, size: 20),
-                Text('切换至${controller.nextThemeType.label}主题'),
-              ],
-            ),
-          ),
-          const PopupMenuItem(
-            value: 'pick_bg',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.wallpaper_outlined, size: 20),
-                Text('自定义背景图'),
-              ],
-            ),
-          ),
-          if (_customBgPath != null)
-            const PopupMenuItem(
-              value: 'reset_bg',
-              child: Row(
-                spacing: 10,
-                children: [
-                  Icon(Icons.restore_outlined, size: 20),
-                  Text('清除背景图'),
-                ],
-              ),
-            ),
-          const PopupMenuItem(
-            value: 'setting',
-            child: Row(
-              spacing: 10,
-              children: [
-                Icon(Icons.settings_outlined, size: 20),
-                Text('设置'),
-              ],
-            ),
-          ),
-        ],
+              ]
+            : null,
       ),
+      onSelected: (value) {
+        switch (value) {
+          case 'search':
+            Get.toNamed('/search');
+          case 'reply':
+            Get.toNamed('/myReply');
+          case 'anonymity':
+            MineController.onChangeAnonymity();
+          case 'switch_account':
+            LoginPageController.switchAccountDialog(context);
+          case 'theme':
+            controller.onChangeTheme();
+          case 'pick_bg':
+            _pickCustomBg();
+          case 'reset_bg':
+            _resetCustomBg();
+          case 'setting':
+            Get.toNamed('/setting', preventDuplicates: false);
+        }
+      },
+      itemBuilder: (_) => [
+        if (!_mainController.hasHome)
+          const PopupMenuItem(
+            value: 'search',
+            child: Row(
+              spacing: 10,
+              children: [
+                Icon(Icons.search, size: 20),
+                Text('搜索'),
+              ],
+            ),
+          ),
+        if (GStorage.reply != null)
+          const PopupMenuItem(
+            value: 'reply',
+            child: Row(
+              spacing: 10,
+              children: [
+                Icon(Icons.message_outlined, size: 20),
+                Text('评论记录'),
+              ],
+            ),
+          ),
+        PopupMenuItem(
+          value: 'anonymity',
+          child: Row(
+            spacing: 10,
+            children: [
+              Icon(
+                MineController.anonymity.value
+                    ? MdiIcons.incognito
+                    : MdiIcons.incognitoOff,
+                size: 20,
+              ),
+              Text(MineController.anonymity.value ? '退出无痕模式' : '进入无痕模式'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'switch_account',
+          child: Row(
+            spacing: 10,
+            children: [
+              Icon(Icons.switch_account_outlined, size: 20),
+              Text('切换账号'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'theme',
+          child: Row(
+            spacing: 10,
+            children: [
+              Icon(controller.themeType.value.icon.icon, size: 20),
+              Text('切换至${controller.nextThemeType.label}主题'),
+            ],
+          ),
+        ),
+        const PopupMenuItem(
+          value: 'pick_bg',
+          child: Row(
+            spacing: 10,
+            children: [
+              Icon(Icons.wallpaper_outlined, size: 20),
+              Text('自定义背景图'),
+            ],
+          ),
+        ),
+        if (_customBgPath != null)
+          const PopupMenuItem(
+            value: 'reset_bg',
+            child: Row(
+              spacing: 10,
+              children: [
+                Icon(Icons.restore_outlined, size: 20),
+                Text('清除背景图'),
+              ],
+            ),
+          ),
+        const PopupMenuItem(
+          value: 'setting',
+          child: Row(
+            spacing: 10,
+            children: [
+              Icon(Icons.settings_outlined, size: 20),
+              Text('设置'),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
