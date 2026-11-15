@@ -320,7 +320,17 @@ class _MainAppState extends PopScopeState<MainApp>
     if (_mainController.mainTabBarView) {
       child = TabBarView(
         controller: _mainController.controller,
-        physics: const NeverScrollableScrollPhysics(),
+        children: _mainController.navigationBars
+    .map(
+      (i) => i == NavigationBarType.mine
+          ? i.page
+          : Padding(
+              padding: EdgeInsets.only(top: _padding.top),
+              child: i.page,
+            ),
+    )
+    .toList(),
+
         scrollDirection: _mainController.useBottomNav ? .horizontal : .vertical,
         children: _mainController.navigationBars.map((i) => i.page).toList(),
       );
@@ -328,7 +338,17 @@ class _MainAppState extends PopScopeState<MainApp>
       child = PageView(
         controller: _mainController.controller,
         physics: const NeverScrollableScrollPhysics(),
-        children: _mainController.navigationBars.map((i) => i.page).toList(),
+children: _mainController.navigationBars
+    .map(
+      (i) => i == NavigationBarType.mine
+          ? i.page
+          : Padding(
+              padding: EdgeInsets.only(top: _padding.top),
+              child: i.page,
+            ),
+    )
+    .toList(),
+
       );
     }
 
@@ -344,7 +364,7 @@ class _MainAppState extends PopScopeState<MainApp>
           child: bottomNav,
         );
       }
-      padding = _padding.copyWith(bottom: 0);
+padding = _padding.copyWith(top: 0, bottom: 0);
     } else {
       sideBar = DecoratedBox(
         decoration: BoxDecoration(
