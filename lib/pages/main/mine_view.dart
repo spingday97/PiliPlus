@@ -157,7 +157,7 @@ class _MediaPageState extends CommonPageState<MinePage>
                   padding: const .only(bottom: 150),
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    _buildTopBannerAndUser(theme, secondary),
+                    _buildTopBannerAndUser(theme, secondary, topPadding),
                     _buildUserStatsRow(theme, secondary),
                     _buildActions(secondary),
                     for (final tab in controller.mineTabs)
@@ -192,27 +192,28 @@ class _MediaPageState extends CommonPageState<MinePage>
     );
   }
 
-  Widget _defaultBg() {
-    return Image.asset(
-      'assets/images/mine_bg.webp',
-      width: double.infinity,
-      fit: BoxFit.fitWidth,
-    );
-  }
-
-  Widget _buildTopBannerAndUser(ThemeData theme, Color secondary) {
+  Widget _buildTopBannerAndUser(
+    ThemeData theme,
+    Color secondary,
+    double topPadding,
+  ) {
     final bgColor = theme.scaffoldBackgroundColor;
     final customPath = _customBgPath;
+    final hasCustomBg = customPath != null && File(customPath).existsSync();
+    if (!hasCustomBg) {
+      return Padding(
+        padding: EdgeInsets.only(top: topPadding + 56, bottom: 4),
+        child: _buildUserIdentityRow(theme, secondary),
+      );
+    }
     return Stack(
       children: [
-        customPath != null && File(customPath).existsSync()
-            ? Image.file(
-                File(customPath),
-                width: double.infinity,
-                fit: BoxFit.fitWidth,
-                errorBuilder: (_, _, _) => _defaultBg(),
-              )
-            : _defaultBg(),
+        Image.file(
+          File(customPath),
+          width: double.infinity,
+          fit: BoxFit.fitWidth,
+          errorBuilder: (_, _, _) => SizedBox(height: topPadding + 120),
+        ),
         Positioned(
           left: 0,
           right: 0,
@@ -345,7 +346,7 @@ class _MediaPageState extends CommonPageState<MinePage>
                 spacing: 10,
                 children: [
                   Icon(Icons.restore_outlined, size: 20),
-                  Text('恢复默认动态背景'),
+                  Text('清除背景图'),
                 ],
               ),
             ),
