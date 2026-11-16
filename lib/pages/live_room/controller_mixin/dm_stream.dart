@@ -14,8 +14,11 @@ mixin _LiveDMStreamMixin
   static final Map<String, Future<dynamic>> _emotePending =
       <String, Future<dynamic>>{};
 
+  static String _toHttps(String url) =>
+      url.startsWith('http://') ? 'https://${url.substring(7)}' : url;
+
   Future<dynamic> _loadEmoteImage(String rawUrl) {
-    final url = rawUrl.http2https;
+    final url = _toHttps(rawUrl);
     if (_emoteImgCache.containsKey(url)) {
       return Future.value(_emoteImgCache[url]);
     }
@@ -172,13 +175,13 @@ mixin _LiveDMStreamMixin
                 : emots?[msg]?.url;
             if (directUrl != null && directUrl.isNotEmpty) {
               danmakuEmoteImg =
-                  _emoteImgCache[directUrl.http2https] ??
+                  _emoteImgCache[_toHttps(directUrl)] ??
                   await _loadEmoteImage(directUrl);
             } else if (emots != null && emots.isNotEmpty) {
               final entries = await Future.wait(
                 emots.entries.map((e) async {
                   final img = e.value.url.isNotEmpty
-                      ? (_emoteImgCache[e.value.url.http2https] ??
+                      ? (_emoteImgCache[_toHttps(e.value.url)] ??
                             await _loadEmoteImage(e.value.url))
                       : null;
                   return MapEntry(e.key, img);
