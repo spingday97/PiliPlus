@@ -14,7 +14,8 @@ mixin _LiveDMStreamMixin
   static final Map<String, Future<dynamic>> _emotePending =
       <String, Future<dynamic>>{};
 
-  Future<dynamic> _loadEmoteImage(String url) {
+  Future<dynamic> _loadEmoteImage(String rawUrl) {
+    final url = rawUrl.http2https;
     if (_emoteImgCache.containsKey(url)) {
       return Future.value(_emoteImgCache[url]);
     }
@@ -41,7 +42,7 @@ mixin _LiveDMStreamMixin
       stream.addListener(listener);
       try {
         var elapsed = 0;
-        while (!done && elapsed < 500) {
+        while (!done && elapsed < 1500) {
           await Future.delayed(const Duration(milliseconds: 25));
           elapsed += 25;
         }
@@ -123,14 +124,12 @@ mixin _LiveDMStreamMixin
   @pragma('vm:notify-debugger-on-exception')
   Future<void> _danmakuListener(dynamic obj) async {
     try {
-      // logger.i(' 原始弹幕消息 ======> ${jsonEncode(obj)}');
       switch (obj['cmd']) {
-        case 'DANMU_MSG':
+        case final String cmd when cmd.startsWith('DANMU_MSG'):
           final info = obj['info'];
           final first = info[0];
           final content = first[15];
           final user = content['user'];
-          // final midHash = first[7];
           final uid = user['uid'] as int;
           final msg = info[1];
           if (isBlocked(msg, uid)) {
@@ -142,7 +141,9 @@ mixin _LiveDMStreamMixin
           if (first[13] case Map<String, dynamic> map) {
             uemote = BaseEmote.fromJson(map);
           }
-          final emots = (extra['emotes'] as Map<String, dynamic>?)?.map(
+          final rawEmots =
+              (extra['emots'] ?? extra['emotes']) as Map<String, dynamic>?;
+          final emots = rawEmots?.map(
             (k, v) => MapEntry(k, BaseEmote.fromJson(v)),
           );
           final checkInfo = info[9];
@@ -166,15 +167,18 @@ mixin _LiveDMStreamMixin
           Map<String, dynamic>? danmakuEmotes;
           if (plPlayerController.showDanmaku &&
               plPlayerController.enableShowLiveDanmaku.value) {
-            if (uemote != null && uemote.url.isNotEmpty) {
+            final directUrl = uemote?.url.isNotEmpty == true
+                ? uemote!.url
+                : emots?[msg]?.url;
+            if (directUrl != null && directUrl.isNotEmpty) {
               danmakuEmoteImg =
-                  _emoteImgCache[uemote.url] ??
-                  await _loadEmoteImage(uemote.url);
+                  _emoteImgCache[directUrl.http2https] ??
+                  await _loadEmoteImage(directUrl);
             } else if (emots != null && emots.isNotEmpty) {
               final entries = await Future.wait(
                 emots.entries.map((e) async {
                   final img = e.value.url.isNotEmpty
-                      ? (_emoteImgCache[e.value.url] ??
+                      ? (_emoteImgCache[e.value.url.http2https] ??
                             await _loadEmoteImage(e.value.url))
                       : null;
                   return MapEntry(e.key, img);
@@ -208,7 +212,6 @@ mixin _LiveDMStreamMixin
                   ? Colors.white
                   : DmUtils.decimalToColor(extra['color']),
               type: DmUtils.getPosition(extra['mode']),
-              // extra['send_from_me'] is invalid
               selfSend: isMainLogin && uid == mid,
               extra: liveExtra,
               emoteImage: danmakuEmoteImg,
