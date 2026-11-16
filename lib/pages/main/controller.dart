@@ -66,7 +66,7 @@ class MainController extends GetxController
 
   late bool directExitOnBack = Pref.directExitOnBack;
 
-  static const _period = 5 * 60 * 1000;
+  static const _period = 30 * 60 * 1000;
   late int _lastSelectTime = 0;
 
   @override
