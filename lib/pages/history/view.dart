@@ -70,7 +70,9 @@ class _HistoryPageState extends State<HistoryPage>
         slivers: [
           SliverPadding(
             padding: EdgeInsets.only(
-              top: 7,
+              left: 14,
+              right: 14,
+              top: 8,
               bottom: padding.bottom + 100,
             ),
             sliver: Obx(
@@ -87,6 +89,7 @@ class _HistoryPageState extends State<HistoryPage>
       () {
         final enableMultiSelect =
             _historyController.baseCtr.enableMultiSelect.value;
+        final colorScheme = Theme.of(context).colorScheme;
         return popScope(
           canPop: !enableMultiSelect,
           onPopInvokedWithResult: (didPop, result) {
@@ -111,25 +114,40 @@ class _HistoryPageState extends State<HistoryPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ?_buildPauseTip,
-                    TabBar(
-                      controller: _historyController.tabController,
-                      onTap: (index) {
-                        if (!_historyController
-                            .tabController!
-                            .indexIsChanging) {
-                          currCtr().scrollController.animToTop();
-                        } else {
-                          if (enableMultiSelect) {
-                            currCtr(
-                              _historyController.tabController!.previousIndex,
-                            ).handleSelect();
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 4,
+                      ),
+                      child: TabBar(
+                        controller: _historyController.tabController,
+                        dividerHeight: 0,
+                        indicatorSize: TabBarIndicatorSize.tab,
+                        indicator: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: colorScheme.secondaryContainer,
+                        ),
+                        labelColor: colorScheme.onSecondaryContainer,
+                        unselectedLabelColor: colorScheme.onSurfaceVariant,
+                        splashBorderRadius: BorderRadius.circular(20),
+                        onTap: (index) {
+                          if (!_historyController
+                              .tabController!
+                              .indexIsChanging) {
+                            currCtr().scrollController.animToTop();
+                          } else {
+                            if (enableMultiSelect) {
+                              currCtr(
+                                _historyController.tabController!.previousIndex,
+                              ).handleSelect();
+                            }
                           }
-                        }
-                      },
-                      tabs: [
-                        const Tab(text: '全部'),
-                        ...tabs.map((item) => Tab(text: item.name)),
-                      ],
+                        },
+                        tabs: [
+                          const Tab(height: 36, text: '全部'),
+                          ...tabs.map((item) => Tab(height: 36, text: item.name)),
+                        ],
+                      ),
                     ),
                     Expanded(
                       child: TabBarView(
@@ -159,6 +177,7 @@ class _HistoryPageState extends State<HistoryPage>
 
   AppBar get _buildAppBar => AppBar(
     automaticallyImplyLeading: !widget.isTab,
+    titleSpacing: widget.isTab ? 22 : null,
     title: const Text('观看记录'),
     actions: [
       IconButton(
@@ -202,11 +221,12 @@ class _HistoryPageState extends State<HistoryPage>
           ),
         ],
       ),
-      const SizedBox(width: 6),
+      const SizedBox(width: 12),
     ],
   );
 
   Widget _buildBody(LoadingState<List<HistoryItemModel>?> loadingState) {
+    final colorScheme = Theme.of(context).colorScheme;
     return switch (loadingState) {
       Loading() => gridSkeleton,
       Success(:final response) =>
@@ -218,11 +238,24 @@ class _HistoryPageState extends State<HistoryPage>
                     _historyController.onLoadMore();
                   }
                   final item = response[index];
-                  return HistoryItem(
-                    item: item,
-                    ctr: _historyController,
-                    onDelete: (kid, business) =>
-                        _historyController.delHistory(item),
+                  return DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: colorScheme.surfaceContainerLow,
+                      borderRadius: BorderRadius.circular(14),
+                      border: Border.all(
+                        color: colorScheme.outline.withValues(alpha: 0.10),
+                        width: 0.6,
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 6),
+                      child: HistoryItem(
+                        item: item,
+                        ctr: _historyController,
+                        onDelete: (kid, business) =>
+                            _historyController.delHistory(item),
+                      ),
+                    ),
                   );
                 },
                 itemCount: response.length,
