@@ -19,7 +19,8 @@ mixin _LiveDMStreamMixin
       return Future.value(_emoteImgCache[url]);
     }
     return _emotePending[url] ??= () async {
-      final completer = Completer<dynamic>();
+      var done = false;
+      dynamic loadedImg;
       final stream = NetworkImage(url).resolve(ImageConfiguration.empty);
       late final ImageStreamListener listener;
       listener = ImageStreamListener(
@@ -29,23 +30,22 @@ mixin _LiveDMStreamMixin
             _emoteImgCache.remove(_emoteImgCache.keys.first);
           }
           _emoteImgCache[url] = info.image;
-          if (!completer.isCompleted) {
-            completer.complete(info.image);
-          }
+          loadedImg = info.image;
+          done = true;
         },
         onError: (_, _) {
           stream.removeListener(listener);
-          if (!completer.isCompleted) {
-            completer.complete(null);
-          }
+          done = true;
         },
       );
       stream.addListener(listener);
       try {
-        return await completer.future.timeout(
-          const Duration(milliseconds: 500),
-          onTimeout: () => null,
-        );
+        var elapsed = 0;
+        while (!done && elapsed < 500) {
+          await Future.delayed(const Duration(milliseconds: 25));
+          elapsed += 25;
+        }
+        return loadedImg;
       } finally {
         _emotePending.remove(url);
       }
