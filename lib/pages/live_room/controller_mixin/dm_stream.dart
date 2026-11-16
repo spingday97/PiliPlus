@@ -10,6 +10,48 @@ mixin _LiveDMStreamMixin
   LiveMessageStream? _msgStream;
   LiveMessageStream? get msgStream => _msgStream;
 
+  static final Map<String, dynamic> _emoteImgCache = <String, dynamic>{};
+  static final Map<String, Future<dynamic>> _emotePending =
+      <String, Future<dynamic>>{};
+
+  Future<dynamic> _loadEmoteImage(String url) {
+    if (_emoteImgCache.containsKey(url)) {
+      return Future.value(_emoteImgCache[url]);
+    }
+    return _emotePending[url] ??= () async {
+      final completer = Completer<dynamic>();
+      final stream = NetworkImage(url).resolve(ImageConfiguration.empty);
+      late final ImageStreamListener listener;
+      listener = ImageStreamListener(
+        (info, _) {
+          stream.removeListener(listener);
+          if (_emoteImgCache.length >= 200) {
+            _emoteImgCache.remove(_emoteImgCache.keys.first);
+          }
+          _emoteImgCache[url] = info.image;
+          if (!completer.isCompleted) {
+            completer.complete(info.image);
+          }
+        },
+        onError: (_, _) {
+          stream.removeListener(listener);
+          if (!completer.isCompleted) {
+            completer.complete(null);
+          }
+        },
+      );
+      stream.addListener(listener);
+      try {
+        return await completer.future.timeout(
+          const Duration(milliseconds: 500),
+          onTimeout: () => null,
+        );
+      } finally {
+        _emotePending.remove(url);
+      }
+    }();
+  }
+
   late final headerKey = GlobalKey<TimeBatteryMixin>();
   late final RxString title = ''.obs;
   late final RxnString onlineCount = RxnString();
@@ -79,7 +121,7 @@ mixin _LiveDMStreamMixin
   }
 
   @pragma('vm:notify-debugger-on-exception')
-  void _danmakuListener(dynamic obj) {
+  Future<void> _danmakuListener(dynamic obj) async {
     try {
       // logger.i(' 原始弹幕消息 ======> ${jsonEncode(obj)}');
       switch (obj['cmd']) {
@@ -100,6 +142,9 @@ mixin _LiveDMStreamMixin
           if (first[13] case Map<String, dynamic> map) {
             uemote = BaseEmote.fromJson(map);
           }
+          final emots = (extra['emotes'] as Map<String, dynamic>?)?.map(
+            (k, v) => MapEntry(k, BaseEmote.fromJson(v)),
+          );
           final checkInfo = info[9];
           final liveExtra = LiveDanmaku(
             id: extra['id_str'],
@@ -116,13 +161,40 @@ mixin _LiveDMStreamMixin
               name: extra['reply_uname'],
             );
           }
+
+          dynamic danmakuEmoteImg;
+          Map<String, dynamic>? danmakuEmotes;
+          if (plPlayerController.showDanmaku &&
+              plPlayerController.enableShowLiveDanmaku.value) {
+            if (uemote != null && uemote.url.isNotEmpty) {
+              danmakuEmoteImg =
+                  _emoteImgCache[uemote.url] ??
+                  await _loadEmoteImage(uemote.url);
+            } else if (emots != null && emots.isNotEmpty) {
+              final entries = await Future.wait(
+                emots.entries.map((e) async {
+                  final img = e.value.url.isNotEmpty
+                      ? (_emoteImgCache[e.value.url] ??
+                            await _loadEmoteImage(e.value.url))
+                      : null;
+                  return MapEntry(e.key, img);
+                }),
+              );
+              final resolved = {
+                for (final e in entries)
+                  if (e.value != null) e.key: e.value,
+              };
+              if (resolved.isNotEmpty) {
+                danmakuEmotes = resolved;
+              }
+            }
+          }
+
           addDm(
             DanmakuMsg(
               name: name,
               text: msg,
-              emots: (extra['emots'] as Map<String, dynamic>?)?.map(
-                (k, v) => MapEntry(k, BaseEmote.fromJson(v)),
-              ),
+              emots: emots,
               uemote: uemote,
               extra: liveExtra,
               reply: reply,
@@ -139,6 +211,8 @@ mixin _LiveDMStreamMixin
               // extra['send_from_me'] is invalid
               selfSend: isMainLogin && uid == mid,
               extra: liveExtra,
+              emoteImage: danmakuEmoteImg,
+              emotes: danmakuEmotes?.cast(),
             ),
           );
           break;
@@ -158,27 +232,6 @@ mixin _LiveDMStreamMixin
             );
           }
           break;
-        // case 'SUPER_CHAT_MESSAGE_DELETE' when showSuperChat:
-        //   if (obj['roomid'] == roomId) {
-        //     final ids = obj['data']?['ids'] as List?;
-        //     if (ids != null && ids.isNotEmpty) {
-        //       if (superChatType == .valid) {
-        //         superChatMsg.removeWhere((e) => ids.contains(e.id));
-        //       } else {
-        //         bool? refresh;
-        //         for (final id in ids) {
-        //           if (superChatMsg.firstWhereOrNull((e) => e.id == id)
-        //               case final item?) {
-        //             item.deleted = true;
-        //             refresh ??= true;
-        //           }
-        //         }
-        //         if (refresh ?? false) {
-        //           superChatMsg.refresh();
-        //         }
-        //       }
-        //     }
-        //   }
         case 'WATCHED_CHANGE':
           watchedShow.value = obj['data']['text_large'];
           break;
