@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:material_ui/material_ui.dart';
 
@@ -16,6 +14,10 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
   const CustomScrollBehavior();
 
   @override
+  ScrollPhysics getScrollPhysics(BuildContext context) =>
+      const BouncingScrollPhysics();
+
+  @override
   Widget buildScrollbar(
     BuildContext context,
     Widget child,
@@ -27,16 +29,7 @@ class CustomScrollBehavior extends MaterialScrollBehavior {
     BuildContext context,
     Widget child,
     ScrollableDetails details,
-  ) {
-    if (Platform.isAndroid) {
-      return StretchingOverscrollIndicator(
-        axisDirection: details.direction,
-        clipBehavior: details.decorationClipBehavior ?? .hardEdge,
-        child: child,
-      );
-    }
-    return child;
-  }
+  ) => child;
 
   @override
   Set<PointerDeviceKind> get dragDevices => desktopDragDevices;
