@@ -51,8 +51,8 @@ abstract final class VideoHttp {
   // 首页推荐视频
   //
   // [desktop] 为 true 时沿用同一个公开网页接口，改用哔哩哔哩官方 Windows
-  // 客户端（Electron 版）首页实际发送的参数组合：plat=1、feed_version=V1、
-  // fresh_type 表示操作类型（0 初次 / 3 刷新 / 4 加载更多）、x_num 与 y_num
+  // 客户端 (Electron 版) 首页实际发送的参数组合：plat=1、feed_version=V1、
+  // fresh_type 表示操作类型 (0 初次 / 3 刷新 / 4 加载更多)、x_num 与 y_num
   // 为可视网格的行列数、pc_wx_install 等标记。参数取自该客户端自身渲染层的
   // 请求代码，不涉及私有接口与设备指纹。
   static Future<LoadingState<List<RcmdVideoItemModel>>> rcmdVideoList({
@@ -156,34 +156,15 @@ abstract final class VideoHttp {
     required int freshIdx,
   }) async {
     final fp = _stableAppFp();
-    final params = {
-      'build': 8430300,
-      'c_locale': 'zh_CN',
-      'channel': 'master',
-      'column': 2,
-      'device': 'phone',
-      'device_name': 'android',
-      'device_type': 0,
-      'disable_rcmd': 0,
-      'flush': 8,
-      'fnval': 976,
-      'fnver': 0,
-      'force_host': 2, //使用https
-      'fourk': 1,
-      'guidance': 1,
-      'https_url_req': 1,
+    final params = <String, Object>{
       'idx': freshIdx,
-      'mobi_app': 'android',
-      'network': 'wifi',
-      'platform': 'android',
-      'player_net': 1,
       'pull': freshIdx == 0 ? 'true' : 'false',
-      'qn': 32,
-      'recsys_mode': 0,
-      's_locale': 'zh_CN',
-      'splash_id': '',
-      'statistics': Constants.statisticsApp,
-      'voice_balance': 0,
+      'column': 2,
+      'flush': freshIdx == 0 ? 5 : 8,
+      'autoplay_card': 11,
+      'mobi_app': 'android',
+      'device': 'android',
+      'build': 8130300,
     };
     final res = await Request().get(
       Api.recommendListApp,
@@ -198,16 +179,12 @@ abstract final class VideoHttp {
           'app-key': 'android',
           'User-Agent': Constants.userAgent,
           'x-bili-trace-id': Constants.traceId,
-          'x-bili-aurora-eid': '',
-          'x-bili-aurora-zone': '',
-          'bili-http-engine': 'cronet',
         },
       ),
     );
     if (res.data['code'] == 0) {
       final list = <RcmdVideoItemAppModel>[];
       for (final i in res.data['data']['items']) {
-
         // 屏蔽推广和拉黑用户
         if (_filterAppRcmd(i)) continue;
         final videoItem = RcmdVideoItemAppModel.fromJson(i);
@@ -386,7 +363,7 @@ abstract final class VideoHttp {
   static String _parseVideoErr(int? code, String? msg) {
     return switch (code) {
       -404 => '视频不存在或已被删除',
-      87008 => '当前视频可能是专属视频，可能需包月充电观看($msg})',
+      87008 => '当前视频可能是专属视频，可能需包月充电观看($msg)',
       _ => '错误($code): $msg',
     };
   }
@@ -636,12 +613,12 @@ abstract final class VideoHttp {
 
   // 发表评论 replyAdd
 
-  // type	num	评论区类型代码	必要	类型代码见表
-  // oid	num	目标评论区id	必要
-  // root	num	根评论rpid	非必要	二级评论以上使用
-  // parent	num	父评论rpid	非必要	二级评论同根评论id 大于二级评论为要回复的评论id
-  // message	str	发送评论内容	必要	最大1000字符
-  // plat	num	发送平台标识	非必要	1：web端 2：安卓客户端  3：ios客户端  4：wp客户端
+  // type       num     评论区类型代码   必要    类型代码见表
+  // oid        num     目标评论区id     必要
+  // root       num     根评论rpid      非必要   二级评论以上使用
+  // parent     num     父评论rpid      非必要   二级评论同根评论id 大于二级评论为要回复的评论id
+  // message    str     发送评论内容     必要     最大1000字符
+  // plat       num     发送平台标识     非必要   1：web端 2：安卓客户端 3：ios客户端 4：wp客户端
   static Future<LoadingState<ReplyInfo?>> replyAdd({
     required int type,
     required int oid,
