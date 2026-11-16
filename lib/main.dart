@@ -200,7 +200,7 @@ void main() async {
     final window = WindowManager.instance.getCurrent();
     if (window != null) {
       final showTitleBar = Pref.showWindowTitleBar;
-      // macOS 隐藏标题栏时改用 contentUnderTitleBar，保持窗口可拖动
+      // macOS 隐藏标题栏时改用 contentUnderTitleBar, 保持窗口可拖动
       final useContentUnderTitleBar = Platform.isMacOS && !showTitleBar;
       window
         ..titleBarStyle = useContentUnderTitleBar || showTitleBar
@@ -317,9 +317,7 @@ class MyApp extends StatelessWidget {
         routeObserver,
         FlutterSmartDialog.observer,
       ],
-      scrollBehavior: PlatformUtils.isDesktop
-          ? const CustomScrollBehavior()
-          : null,
+      scrollBehavior: const CustomScrollBehavior(),
     );
   }
 
@@ -413,7 +411,7 @@ class _CustomHttpOverrides extends HttpOverrides {
     final client = super.createHttpClient(context);
     // ..maxConnectionsPerHost = 32
     /// The default value is 15 seconds.
-    //   ..idleTimeout = const Duration(seconds: 15);
+    // ..idleTimeout = const Duration(seconds: 15);
     if (kDebugMode || Pref.badCertificateCallback) {
       client.badCertificateCallback = (cert, host, port) => true;
     }
