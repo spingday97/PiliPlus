@@ -226,12 +226,22 @@ class _MediaPageState extends CommonPageState<MinePage>
     }
     return Stack(
       children: [
-        Image.file(
-          File(_customBgPath!),
-          width: double.infinity,
-          fit: BoxFit.fitWidth,
-          errorBuilder: (_, _, _) => SizedBox(height: topPadding + 120),
-        ),
+        Obx(() {
+          final idx = _mainController.selectedIndex.value;
+          final isMineActive =
+              widget.showBackBtn ||
+              (idx < _mainController.navigationBars.length &&
+                  _mainController.navigationBars[idx] == NavigationBarType.mine);
+          return TickerMode(
+            enabled: isMineActive,
+            child: Image.file(
+              File(_customBgPath!),
+              width: double.infinity,
+              fit: BoxFit.fitWidth,
+              errorBuilder: (_, _, _) => SizedBox(height: topPadding + 120),
+            ),
+          );
+        }),
         Positioned(
           left: 0,
           right: 0,
