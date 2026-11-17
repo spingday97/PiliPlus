@@ -403,6 +403,19 @@ List<SettingsModel> get playSettings => [
       onChanged: (value) =>
           videoPlayerServiceHandler!.enableBackgroundPlay = value,
     ),
+  if (PlatformUtils.isMobile)
+    SwitchModel(
+      title: '允许与其他应用同时播放',
+      subtitle: '开启后不抢占音频焦点，其他应用播放时也不会暂停',
+      leading: const Icon(Icons.layers_outlined),
+      setKey: SettingBoxKey.allowPlayWithOthers,
+      defaultVal: false,
+      onChanged: (value) {
+        if (value) {
+          audioSessionHandler?.setActive(false);
+        }
+        },
+      ),
   PopupModel(
     title: '播放顺序',
     leading: const Icon(Icons.repeat),
