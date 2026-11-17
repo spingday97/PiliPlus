@@ -2,11 +2,15 @@ import 'package:PiliPlus/plugin/pl_player/controller.dart';
 import 'package:PiliPlus/services/service_locator.dart';
 import 'package:audio_session/audio_session.dart';
 
+import 'package:PiliPlus/utils/storage_pref.dart';
 class AudioSessionHandler {
   late AudioSession _session;
   bool _shouldResume = false;
 
   Future<bool> setActive(bool active) {
+    if (active && Pref.allowPlayWithOthers) {
+      return Future.value(true);
+    }
     return _session.setActive(active);
   }
 
@@ -28,6 +32,7 @@ class AudioSessionHandler {
   }
 
   void _onInterrupted(AudioInterruptionEvent event) {
+    if (Pref.allowPlayWithOthers) return;
     if (event.begin) {
       final player = PlPlayerController.instance;
       switch (event.type) {
