@@ -108,6 +108,21 @@ class VideoPlayerServiceHandler extends BaseAudioHandler with SeekHandler {
         Future.syncValue(null);
   }
 
+  @override
+  Future<void> stop() async {
+    try {
+      await pause();
+    } catch (_) {}
+    clear();
+    await super.stop();
+  }
+
+  @override
+  Future<void> onTaskRemoved() async {
+    await stop();
+    await super.onTaskRemoved();
+  }
+  
   CommonIntroController? _findIntroController() {
     final playOwner = PlPlayerController.playOwner;
     if (playOwner != null) {
