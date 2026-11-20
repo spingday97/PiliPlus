@@ -14,6 +14,7 @@ import 'package:PiliPlus/common/widgets/scroll_physics.dart'
 import 'package:PiliPlus/common/widgets/stateful_builder.dart';
 import 'package:PiliPlus/models/common/bar_hide_type.dart';
 import 'package:PiliPlus/models/common/dynamic/dynamic_badge_mode.dart';
+import 'package:PiliPlus/models/common/dynamic/dynamics_type.dart';
 import 'package:PiliPlus/models/common/dynamic/up_panel_position.dart';
 import 'package:PiliPlus/models/common/home_tab_type.dart';
 import 'package:PiliPlus/models/common/member/tab_type.dart';
@@ -405,6 +406,27 @@ List<SettingsModel> get styleSettings => [
     title: '首页标签页',
     subtitle: '删除或调换首页标签页',
     leading: const Icon(Icons.toc_outlined),
+  ),
+  NormalModel(
+    onTap: (context, setState) => Get.toNamed(
+      '/barSetting',
+      arguments: {
+        'key': SettingBoxKey.dynamicsTabSort,
+        'defaultBars': DynamicsTabType.values,
+        'title': '动态标签页',
+      },
+    ),
+    title: '动态标签页',
+    subtitle: '删除或调换动态标签页',
+    leading: const Icon(Icons.toc_outlined),
+  ),
+  SwitchModel(
+    title: '现代轻卡片界面',
+    subtitle: '浅灰画布配纯白大圆角卡片，关闭为经典原版',
+    leading: const Icon(Icons.style_outlined),
+    setKey: SettingBoxKey.modernCardUi,
+    defaultVal: false,
+    onChanged: (_) => Get.forceAppUpdate(),
   ),
   NormalModel(
     onTap: (context, setState) => Get.toNamed(
