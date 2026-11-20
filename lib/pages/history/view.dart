@@ -114,40 +114,39 @@ class _HistoryPageState extends State<HistoryPage>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     ?_buildPauseTip,
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 4,
+                    TabBar(
+                      controller: _historyController.tabController,
+                      dividerHeight: 0,
+                      indicatorSize: TabBarIndicatorSize.label,
+                      indicatorWeight: 3,
+                      indicatorColor: colorScheme.primary,
+                      labelColor: colorScheme.primary,
+                      unselectedLabelColor: colorScheme.onSurface,
+                      labelStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
                       ),
-                      child: TabBar(
-                        controller: _historyController.tabController,
-                        dividerHeight: 0,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        indicator: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: colorScheme.secondaryContainer,
-                        ),
-                        labelColor: colorScheme.onSecondaryContainer,
-                        unselectedLabelColor: colorScheme.onSurfaceVariant,
-                        splashBorderRadius: BorderRadius.circular(20),
-                        onTap: (index) {
-                          if (!_historyController
-                              .tabController!
-                              .indexIsChanging) {
-                            currCtr().scrollController.animToTop();
-                          } else {
-                            if (enableMultiSelect) {
-                              currCtr(
-                                _historyController.tabController!.previousIndex,
-                              ).handleSelect();
-                            }
+                      unselectedLabelStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      onTap: (index) {
+                        if (!_historyController
+                            .tabController!
+                            .indexIsChanging) {
+                          currCtr().scrollController.animToTop();
+                        } else {
+                          if (enableMultiSelect) {
+                            currCtr(
+                              _historyController.tabController!.previousIndex,
+                            ).handleSelect();
                           }
-                        },
-                        tabs: [
-                          const Tab(height: 36, text: '全部'),
-                          ...tabs.map((item) => Tab(height: 36, text: item.name)),
-                        ],
-                      ),
+                        }
+                      },
+                      tabs: [
+                        const Tab(height: 38, text: '全部'),
+                        ...tabs.map((item) => Tab(height: 38, text: item.name)),
+                      ],
                     ),
                     Expanded(
                       child: TabBarView(
@@ -175,55 +174,86 @@ class _HistoryPageState extends State<HistoryPage>
     );
   }
 
-  AppBar get _buildAppBar => AppBar(
-    automaticallyImplyLeading: !widget.isTab,
-    titleSpacing: widget.isTab ? 22 : null,
-    title: const Text('观看记录'),
-    actions: [
-      IconButton(
-        tooltip: '搜索',
-        onPressed: () => Get.toNamed('/historySearch'),
-        icon: const Icon(Icons.search_outlined),
-      ),
-      PopupMenuButton(
-        itemBuilder: (_) => [
-          PopupMenuItem(
-            onTap: () => _historyController.baseCtr.onPauseHistory(context),
-            child: Text(
-              !_historyController.baseCtr.pauseStatus.value
-                  ? '暂停观看记录'
-                  : '恢复观看记录',
+  AppBar get _buildAppBar {
+    final colorScheme = Theme.of(context).colorScheme;
+    return AppBar(
+      automaticallyImplyLeading: !widget.isTab,
+      titleSpacing: widget.isTab ? 16 : 0,
+      title: SizedBox(
+        height: 42,
+        child: Material(
+          color: colorScheme.onSecondaryContainer.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(25),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => Get.toNamed('/historySearch'),
+            child: Row(
+              children: [
+                const SizedBox(width: 14),
+                Icon(
+                  Icons.search_outlined,
+                  size: 20,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    '搜索观看记录...',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: colorScheme.outline,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
             ),
           ),
-          PopupMenuItem(
-            onTap: () => _historyController.baseCtr.onClearHistory(
-              context,
-              () {
-                _historyController.loadingState.value = const Success(null);
-                if (_historyController.tabController != null) {
-                  for (final item in _historyController.tabs) {
-                    try {
-                      Get.find<HistoryController>(
-                        tag: item.type,
-                      ).loadingState.value = const Success(
-                        null,
-                      );
-                    } catch (_) {}
+        ),
+      ),
+      actions: [
+        PopupMenuButton(
+          itemBuilder: (_) => [
+            PopupMenuItem(
+              onTap: () => _historyController.baseCtr.onPauseHistory(context),
+              child: Text(
+                !_historyController.baseCtr.pauseStatus.value
+                    ? '暂停观看记录'
+                    : '恢复观看记录',
+              ),
+            ),
+            PopupMenuItem(
+              onTap: () => _historyController.baseCtr.onClearHistory(
+                context,
+                () {
+                  _historyController.loadingState.value = const Success(null);
+                  if (_historyController.tabController != null) {
+                    for (final item in _historyController.tabs) {
+                      try {
+                        Get.find<HistoryController>(
+                          tag: item.type,
+                        ).loadingState.value = const Success(
+                          null,
+                        );
+                      } catch (_) {}
+                    }
                   }
-                }
-              },
+                },
+              ),
+              child: const Text('清空观看记录'),
             ),
-            child: const Text('清空观看记录'),
-          ),
-          PopupMenuItem(
-            onTap: currCtr().onDelViewedHistory,
-            child: const Text('删除已看记录'),
-          ),
-        ],
-      ),
-      const SizedBox(width: 12),
-    ],
-  );
+            PopupMenuItem(
+              onTap: currCtr().onDelViewedHistory,
+              child: const Text('删除已看记录'),
+            ),
+          ],
+        ),
+        const SizedBox(width: 6),
+      ],
+    );
+  }
 
   Widget _buildBody(LoadingState<List<HistoryItemModel>?> loadingState) {
     final colorScheme = Theme.of(context).colorScheme;
