@@ -629,7 +629,7 @@ class _SearchUpBottomSheetState extends State<_SearchUpBottomSheet> {
       );
       if (!mounted || _textController.text.trim() != q) return;
       if (res case Success(:final response)) {
-        final list = response.list;
+        final list = response.list ?? const [];
         setState(() {
           _isSearching = false;
           _remoteResults = list
