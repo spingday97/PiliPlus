@@ -250,6 +250,8 @@ abstract final class SettingBoxKey {
       hideBottomBar = 'hideTabBar',
       barHideType = 'barHideType',
       tabBarSort = 'tabBarSort',
+      dynamicsTabSort = 'dynamicsTabSort',
+      modernCardUi = 'modernCardUi',
       dynamicBadgeMode = 'dynamicBadgeMode',
       msgBadgeMode = 'msgBadgeMode',
       msgUnReadTypeV2 = 'msgUnReadTypeV2',
