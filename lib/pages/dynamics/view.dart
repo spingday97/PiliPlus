@@ -18,6 +18,7 @@ import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/extension/get_ext.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart' hide DraggableScrollableSheet;
 
@@ -50,75 +51,68 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     GStorage.setting.put(_liveFirstLayoutKey, next);
   }
 
-  Widget _layoutToggleBtn(ColorScheme colorScheme) => Container(
-    width: 34,
-    height: 34,
-    margin: const .only(right: 8),
-    child: IconButton(
-      tooltip: _useLiveFirstLayout ? '切换为经典动态布局' : '切换为直播优先布局',
-      style: ButtonStyle(
-        padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-        backgroundColor: WidgetStatePropertyAll(
+  Widget _actionPill(ColorScheme colorScheme, {bool reverse = false}) {
+    final isModern = Pref.modernCardUi;
+    final items = <Widget>[
+      IconButton(
+        tooltip: _useLiveFirstLayout ? '切换为经典动态布局' : '切换为直播优先布局',
+        visualDensity: .compact,
+        constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+        padding: EdgeInsets.zero,
+        onPressed: _toggleLayout,
+        icon: Icon(
           _useLiveFirstLayout
-              ? colorScheme.primaryContainer
-              : colorScheme.secondaryContainer,
+              ? Icons.view_sidebar_outlined
+              : Icons.grid_view_rounded,
+          size: 18,
+          color: _useLiveFirstLayout
+              ? colorScheme.primary
+              : colorScheme.onSurfaceVariant,
         ),
       ),
-      onPressed: _toggleLayout,
-      icon: Icon(
-        _useLiveFirstLayout
-            ? Icons.view_sidebar_outlined
-            : Icons.view_agenda_outlined,
-        size: 18,
-        color: _useLiveFirstLayout
-            ? colorScheme.onPrimaryContainer
-            : colorScheme.onSecondaryContainer,
-      ),
-    ),
-  );
-
-  Widget _searchUpBtn(ColorScheme colorScheme) => Container(
-    width: 34,
-    height: 34,
-    margin: const .only(right: 8),
-    child: IconButton(
-      tooltip: '搜索关注的 UP 主',
-      style: ButtonStyle(
-        padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-        backgroundColor: WidgetStatePropertyAll(
-          colorScheme.secondaryContainer,
+      IconButton(
+        tooltip: '搜索关注的 UP 主',
+        visualDensity: .compact,
+        constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+        padding: EdgeInsets.zero,
+        onPressed: () => _showSearchUpSheet(context),
+        icon: Icon(
+          Icons.search,
+          size: 19,
+          color: colorScheme.onSurfaceVariant,
         ),
       ),
-      onPressed: () => _showSearchUpSheet(context),
-      icon: Icon(
-        Icons.search,
-        size: 18,
-        color: colorScheme.onSecondaryContainer,
-      ),
-    ),
-  );
-
-  Widget _createDynamicBtn(ColorScheme colorScheme, {bool isRight = true}) =>
-      Container(
-        width: 34,
-        height: 34,
-        margin: isRight ? const .only(right: 16) : const .only(left: 16),
-        child: IconButton(
-          tooltip: '发布动态',
-          style: ButtonStyle(
-            padding: const WidgetStatePropertyAll(EdgeInsets.zero),
-            backgroundColor: WidgetStatePropertyAll(
-              colorScheme.secondaryContainer,
-            ),
-          ),
-          onPressed: () => CreateDynPanel.onCreateDyn(context),
-          icon: Icon(
-            Icons.add,
-            size: 18,
-            color: colorScheme.onSecondaryContainer,
-          ),
+      IconButton(
+        tooltip: '发布动态',
+        visualDensity: .compact,
+        constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+        padding: EdgeInsets.zero,
+        onPressed: () => CreateDynPanel.onCreateDyn(context),
+        icon: Icon(
+          Icons.add,
+          size: 20,
+          color: colorScheme.onSurfaceVariant,
         ),
-      );
+      ),
+    ];
+    return Container(
+      height: 36,
+      margin: reverse ? const .only(left: 12) : const .only(right: 14),
+      padding: const .symmetric(horizontal: 4),
+      decoration: BoxDecoration(
+        color: isModern ? Colors.white : colorScheme.surfaceContainerLow,
+        borderRadius: .circular(18),
+        border: .all(
+          color: colorScheme.outline.withValues(alpha: 0.22),
+          width: 0.8,
+        ),
+      ),
+      child: Row(
+        mainAxisSize: .min,
+        children: reverse ? items.reversed.toList() : items,
+      ),
+    );
+  }
 
   Widget _buildLiveStrip(ColorScheme colorScheme) {
     return Obx(() {
@@ -170,7 +164,9 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
                 itemBuilder: (context, index) {
                   final item = items[index];
                   return Material(
-                    color: colorScheme.surfaceContainerLow,
+                    color: Pref.modernCardUi
+                        ? Colors.white
+                        : colorScheme.surfaceContainerLow,
                     borderRadius: .circular(14),
                     clipBehavior: .antiAlias,
                     child: InkWell(
@@ -309,7 +305,8 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
   Widget upPanelPart(ColorScheme colorScheme) {
     final isTop = upPanelPosition == .top;
     final needBg = upPanelPosition.index > 2;
-    return Material(
+    final isModern = Pref.modernCardUi;
+    final panel = Material(
       type: needBg ? .canvas : .transparency,
       color: needBg ? colorScheme.surface : null,
       child: SizedBox(
@@ -328,6 +325,22 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
           ),
         ),
       ),
+    );
+    if (needBg) return panel;
+    return Container(
+      margin: isTop
+          ? const .fromLTRB(10, 4, 10, 6)
+          : const .fromLTRB(8, 6, 4, 8),
+      decoration: BoxDecoration(
+        color: isModern ? Colors.white : colorScheme.surfaceContainerLow,
+        borderRadius: .circular(16),
+        border: .all(
+          color: colorScheme.outline.withValues(alpha: 0.12),
+          width: 0.6,
+        ),
+      ),
+      clipBehavior: .antiAlias,
+      child: panel,
     );
   }
 
@@ -371,6 +384,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
   Widget build(BuildContext context) {
     super.build(context);
     final colorScheme = ColorScheme.of(context);
+    final isModern = Pref.modernCardUi;
 
     Widget? drawer;
     Widget? endDrawer;
@@ -380,7 +394,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
 
     final tabView = tabBarView(
       controller: _dynamicsController.tabController,
-      children: DynamicsTabType.values
+      children: _dynamicsController.tabs
           .map((e) => DynamicsTabPage(dynamicsType: e))
           .toList(),
     );
@@ -395,14 +409,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
         : tabView;
 
     if (_useLiveFirstLayout) {
-      actions = Row(
-        mainAxisSize: .min,
-        children: [
-          _layoutToggleBtn(colorScheme),
-          _searchUpBtn(colorScheme),
-          _createDynamicBtn(colorScheme),
-        ],
-      );
+      actions = _actionPill(colorScheme);
     } else {
       switch (upPanelPosition) {
         case .top:
@@ -412,14 +419,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
               Expanded(child: child),
             ],
           );
-          actions = Row(
-            mainAxisSize: .min,
-            children: [
-              _layoutToggleBtn(colorScheme),
-              _searchUpBtn(colorScheme),
-              _createDynamicBtn(colorScheme),
-            ],
-          );
+          actions = _actionPill(colorScheme);
         case .leftFixed:
           child = Row(
             children: [
@@ -427,14 +427,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
               Expanded(child: child),
             ],
           );
-          actions = Row(
-            mainAxisSize: .min,
-            children: [
-              _layoutToggleBtn(colorScheme),
-              _searchUpBtn(colorScheme),
-              _createDynamicBtn(colorScheme),
-            ],
-          );
+          actions = _actionPill(colorScheme);
         case .rightFixed:
           child = Row(
             children: [
@@ -442,36 +435,14 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
               upPanelPart(colorScheme),
             ],
           );
-          actions = Row(
-            mainAxisSize: .min,
-            children: [
-              _layoutToggleBtn(colorScheme),
-              _searchUpBtn(colorScheme),
-              _createDynamicBtn(colorScheme),
-            ],
-          );
+          actions = _actionPill(colorScheme);
         case .leftDrawer:
           drawer = upPanelPart(colorScheme);
-          actions = Row(
-            mainAxisSize: .min,
-            children: [
-              _layoutToggleBtn(colorScheme),
-              _searchUpBtn(colorScheme),
-              _createDynamicBtn(colorScheme),
-            ],
-          );
+          actions = _actionPill(colorScheme);
           leading = const DrawerButton();
         case .rightDrawer:
           endDrawer = upPanelPart(colorScheme);
-          leading = Row(
-            mainAxisSize: .min,
-            children: [
-              _createDynamicBtn(colorScheme, isRight: false),
-              const SizedBox(width: 8),
-              _searchUpBtn(colorScheme),
-              _layoutToggleBtn(colorScheme),
-            ],
-          );
+          leading = _actionPill(colorScheme, reverse: true);
           actions = const EndDrawerButton();
       }
     }
@@ -491,15 +462,34 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
                 isScrollable: true,
                 tabAlignment: .start,
                 dividerColor: Colors.transparent,
-                labelColor: colorScheme.primary,
+                indicatorSize: isModern
+                    ? TabBarIndicatorSize.tab
+                    : TabBarIndicatorSize.label,
+                indicatorWeight: isModern ? 0 : 3,
+                indicatorPadding: isModern
+                    ? const .symmetric(vertical: 7)
+                    : EdgeInsets.zero,
+                indicator: isModern
+                    ? BoxDecoration(
+                        color: colorScheme.secondaryContainer,
+                        borderRadius: .circular(18),
+                      )
+                    : null,
                 indicatorColor: colorScheme.primary,
+                labelColor: isModern
+                    ? colorScheme.onSecondaryContainer
+                    : colorScheme.primary,
                 controller: _dynamicsController.tabController,
                 unselectedLabelColor: colorScheme.onSurface,
-                labelStyle:
-                    TabBarTheme.of(context).labelStyle
-                        ?.copyWith(fontSize: 13) ??
-                    const TextStyle(fontSize: 13),
-                tabs: DynamicsTabType.values
+                labelStyle: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                ),
+                unselectedLabelStyle: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.normal,
+                ),
+                tabs: _dynamicsController.tabs
                     .map((e) => Tab(text: e.label))
                     .toList(),
                 onTap: (index) {
