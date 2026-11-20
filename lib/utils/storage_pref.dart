@@ -678,6 +678,9 @@ abstract final class Pref {
       _setting.get(SettingBoxKey.enableBackgroundPlay, defaultValue: true);
   static bool get allowPlayWithOthers =>
      _setting.get(SettingBoxKey.allowPlayWithOthers, defaultValue: false);
+
+  static bool get modernCardUi =>
+      _setting.get(SettingBoxKey.modernCardUi, defaultValue: false);
     
   static bool get disableLikeMsg =>
       _setting.get(SettingBoxKey.disableLikeMsg, defaultValue: false);
