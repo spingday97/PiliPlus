@@ -11,6 +11,8 @@ import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/extension/scroll_controller_ext.dart';
 import 'package:PiliPlus/utils/extension/string_ext.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
+import 'package:PiliPlus/utils/storage.dart';
+import 'package:PiliPlus/utils/storage_key.dart';
 import 'package:easy_debounce/easy_throttle.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart' show TabController;
@@ -19,6 +21,7 @@ class DynamicsController
     extends CommonDataController<FollowUpModel, FollowUpModel>
     with GetSingleTickerProviderStateMixin, AccountMixin {
   late final TabController tabController;
+late final List<DynamicsTabType> tabs;
 
   final Set<int> tempBannedList = <int>{};
 
@@ -38,7 +41,7 @@ class DynamicsController
   DynamicsTabController? get controller {
     try {
       return Get.find<DynamicsTabController>(
-        tag: DynamicsTabType.values[tabController.index].name,
+        tag: tabs[tabController.index].name,
       );
     } catch (_) {
       return null;
@@ -48,16 +51,34 @@ class DynamicsController
   @override
   void onInit() {
     super.onInit();
+    final rawTabs = GStorage.setting.get(SettingBoxKey.dynamicsTabSort) as List?;
+    if (rawTabs != null && rawTabs.isNotEmpty) {
+      final parsed = rawTabs
+          .whereType<int>()
+          .where((i) => i >= 0 && i < DynamicsTabType.values.length)
+          .map((i) => DynamicsTabType.values[i])
+          .toList();
+      tabs = parsed.isNotEmpty ? parsed : DynamicsTabType.values;
+    } else {
+      tabs = DynamicsTabType.values;
+    }
     tabController = TabController(
       vsync: this,
-      length: DynamicsTabType.values.length,
-      initialIndex: Pref.defaultDynamicTypeIndex,
+      length: tabs.length,
+      initialIndex: Pref.defaultDynamicTypeIndex.clamp(0, tabs.length - 1),
     );
     queryData();
   }
 
   void _jumpToTab(int mid) {
-    tabController.index = mid == -1 ? 0 : 4;
+    if (mid == -1) {
+      tabController.index = 0;
+    } else {
+      final upIndex = tabs.indexOf(DynamicsTabType.up);
+      if (upIndex >= 0) {
+        tabController.index = upIndex;
+      }
+    }
   }
 
   void onSelectUp(int mid) {
