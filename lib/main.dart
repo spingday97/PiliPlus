@@ -277,16 +277,45 @@ class MyApp extends StatelessWidget {
       darkScheme = brandColor.asColorSchemeSeed(variant, .dark);
     }
 
+    var light = ThemeUtils.getThemeData(
+      colorScheme: lightScheme,
+      isDynamic: dynamicColor,
+    );
+    var dark = ThemeUtils.getThemeData(
+      isDark: true,
+      colorScheme: darkScheme,
+      isDynamic: dynamicColor,
+    );
+    if (Pref.modernCardUi) {
+      light = light.copyWith(
+        scaffoldBackgroundColor: const Color(0xFFF3F5F8),
+        cardTheme: CardThemeData(
+          color: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0x14000000), width: 0.8),
+          ),
+        ),
+      );
+      dark = dark.copyWith(
+        scaffoldBackgroundColor: darkScheme.surfaceContainerLowest,
+        cardTheme: CardThemeData(
+          color: darkScheme.surfaceContainer,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(
+              color: darkScheme.outline.withValues(alpha: 0.14),
+              width: 0.8,
+            ),
+          ),
+        ),
+      );
+    }
     return (
-      ThemeUtils.lightTheme = ThemeUtils.getThemeData(
-        colorScheme: lightScheme,
-        isDynamic: dynamicColor,
-      ),
-      ThemeUtils.darkTheme = ThemeUtils.getThemeData(
-        isDark: true,
-        colorScheme: darkScheme,
-        isDynamic: dynamicColor,
-      ),
+      ThemeUtils.lightTheme = light,
+      ThemeUtils.darkTheme = dark,
     );
   }
 
