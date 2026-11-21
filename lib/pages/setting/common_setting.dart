@@ -1,6 +1,7 @@
 import 'package:PiliPlus/common/widgets/scaffold/simple_scaffold.dart';
 import 'package:PiliPlus/models/common/setting_type.dart';
 import 'package:PiliPlus/pages/setting/models/model.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:material_ui/material_ui.dart';
 
 class CommonSetting extends StatefulWidget {
@@ -53,12 +54,13 @@ class _CommonSettingState extends State<CommonSetting> {
       body: ListView.builder(
         key: ValueKey(widget.settingType),
         padding: EdgeInsets.only(
+          top: Pref.modernCardUi ? 8 : 0,
           left: showAppBar ? padding.left : 0,
           right: showAppBar ? padding.right : 0,
           bottom: padding.bottom + 100,
         ),
         itemCount: settings.length,
-        itemBuilder: (context, index) => settings[index].widget,
+       itemBuilder: (context, index) => Pref.modernCardUi ? Container(margin: const EdgeInsets.fromLTRB(14, 0, 14, 8), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.12), width: 0.7)), clipBehavior: Clip.antiAlias, child: settings[index].widget) : settings[index].widget,
       ),
     );
   }
