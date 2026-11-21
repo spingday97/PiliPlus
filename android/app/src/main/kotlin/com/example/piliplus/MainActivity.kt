@@ -1,6 +1,8 @@
 package com.example.piliplus
 
 import android.content.Intent
+import android.content.ComponentName
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
@@ -63,6 +65,32 @@ class MainActivity : AudioServiceActivity() {
                 }
                 startActivity(intent)
                 result.success(true)
+} else if (call.method == "setAppIcon") {
+val alias = call.argument<String>("alias") ?: "LauncherDefault"
+val aliases = listOf(
+"LauncherDefault",
+"LauncherSlate",
+"LauncherCoral",
+"LauncherCeramic",
+"LauncherOled",
+)
+if (!aliases.contains(alias)) {
+result.error("INVALID_ALIAS", "Unknown icon alias", null)
+return@setMethodCallHandler
+}
+for (name in aliases) {
+val state = if (name == alias) {
+PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+} else {
+PackageManager.COMPONENT_ENABLED_STATE_DISABLED
+}
+packageManager.setComponentEnabledSetting(
+ComponentName(this@MainActivity, "$packageName.$name"),
+state,
+PackageManager.DONT_KILL_APP,
+)
+}
+result.success(true)
             } else {
                 result.notImplemented()
             }
