@@ -440,7 +440,7 @@ List<SettingsModel> get styleSettings => [
       Get.forceAppUpdate();
     },
   ),
-  if (PlatformUtils.isAndroid)
+  if (Platform.isAndroid)
     PopupModel<_AppIconAlias>(
       title: '桌面应用图标',
       leading: const Icon(Icons.apps_outlined),
