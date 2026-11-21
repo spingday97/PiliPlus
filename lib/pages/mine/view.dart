@@ -285,11 +285,11 @@ else
               const SizedBox(width: 12),
               Expanded(
                 child: _buildBentoTile(
-                  title: '外观设置',
-                  icon: Icons.palette_rounded,
+                  title: '系统设置',
+                  icon: Icons.settings_rounded,
                   bgColor: Colors.pink.withValues(alpha: 0.12),
                   fgColor: Colors.pink,
-                  onTap: () => Get.toNamed('/styleSetting'),
+                  onTap: () => Get.toNamed('/setting'),
                 ),
               ),
             ],
