@@ -263,7 +263,7 @@ class MyApp extends StatelessWidget {
     final dynamicColor = _light != null && _dark != null && Pref.dynamicColor;
 
     final ColorScheme lightScheme, darkScheme;
-    if (dynamicColor) {
+    if (Pref.colorPreset >= 1 && Pref.colorPreset <= 4) { final presetColor = switch (Pref.colorPreset) { 1 => const Color(0xFF5D738D), 2 => const Color(0xFFE06C75), 3 => const Color(0xFF4A7C6F), _ => const Color(0xFF7CC4FA) }; final variant = Pref.schemeVariant; lightScheme = presetColor.asColorSchemeSeed(variant, .light); darkScheme = presetColor.asColorSchemeSeed(variant, .dark); } else if (dynamicColor) {
       lightScheme = _light!;
       darkScheme = _dark!;
     } else {
@@ -286,9 +286,9 @@ class MyApp extends StatelessWidget {
       colorScheme: darkScheme,
       isDynamic: dynamicColor,
     );
-    if (Pref.modernCardUi) {
+    if (Pref.modernCardUi || Pref.colorPreset > 0) {
       light = light.copyWith(
-        scaffoldBackgroundColor: const Color(0xFFF3F5F8),
+        scaffoldBackgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), _ => const Color(0xFFF3F5F8) },
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 0,
@@ -299,9 +299,9 @@ class MyApp extends StatelessWidget {
         ),
       );
       dark = dark.copyWith(
-        scaffoldBackgroundColor: darkScheme.surfaceContainerLowest,
+        scaffoldBackgroundColor: Pref.colorPreset == 4 ? Colors.black : darkScheme.surfaceContainerLowest,
         cardTheme: CardThemeData(
-          color: darkScheme.surfaceContainer,
+          color: Pref.colorPreset == 4 ? const Color(0xFF161920) : darkScheme.surfaceContainer,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
