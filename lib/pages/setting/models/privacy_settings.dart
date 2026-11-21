@@ -17,35 +17,6 @@ List<SettingsModel> get privacySettings => [
     subtitle: '已拉黑用户',
     leading: const Icon(Icons.block),
   ),
-  const NormalModel(
-    title: 'buvid设置',
-    leading: Icon(CustomIcons.identifier_circle),
-    onTap: _showBuvidDialog,
-  ),
-  NormalModel(
-    onTap: (context, setState) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('账号模式详情'),
-          content: SelectionArea(
-            child: SingleChildScrollView(
-              child: _getAccountDetail(context),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: Get.back,
-              child: const Text('确认'),
-            ),
-          ],
-        ),
-      );
-    },
-    leading: const Icon(Icons.flag_outlined),
-    title: '了解账号模式',
-    subtitle: '查看各个账号模式作用的API列表',
-  ),
 ];
 
 Widget _getAccountDetail(BuildContext context) {
