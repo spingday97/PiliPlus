@@ -488,7 +488,12 @@ enum _ColorPreset implements EnumWithLabel {
   morandiSlate(1, '莫兰迪灰蓝'),
   warmCoral(2, '暖樱珊瑚'),
   sageGreen(3, '鼠尾草青'),
-  amoledDark(4, 'AMOLED 暗夜');
+  amoledDark(4, 'AMOLED 暗夜'),
+    auroraLavender(5, '极光紫雾'),
+    amberSunset(6, '琥珀暖阳'),
+    deepOcean(7, '深海靛蓝'),
+    dustyRose(8, '烟粉玫瑰'),
+    midnightObsidian(9, '星夜曜石 (暗色)');
 
   final int code;
   @override
