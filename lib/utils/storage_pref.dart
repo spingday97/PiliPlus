@@ -681,6 +681,12 @@ abstract final class Pref {
 
   static bool get modernCardUi =>
       _setting.get(SettingBoxKey.modernCardUi, defaultValue: false);
+
+static int get colorPreset =>
+_setting.get(SettingBoxKey.colorPreset, defaultValue: 0);
+
+static String get appIconAlias =>
+_setting.get(SettingBoxKey.appIconAlias, defaultValue: 'LauncherDefault');
     
   static bool get disableLikeMsg =>
       _setting.get(SettingBoxKey.disableLikeMsg, defaultValue: false);
