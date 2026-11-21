@@ -19,7 +19,16 @@ import 'package:path_provider/path_provider.dart';
 
 abstract final class Update {
   static const MethodChannel _channel = MethodChannel('piliplus/install');
-
+  static Future<void> cleanUpOldApk() async {
+    try {
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/PiliPlus_update.apk');
+      if (file.existsSync()) {
+        await file.delete();
+      }
+      } catch (_) {}
+  }
+  
   static Future<void> checkUpdate([bool isAuto = true]) async {
     if (kDebugMode) return;
     SmartDialog.dismiss();
