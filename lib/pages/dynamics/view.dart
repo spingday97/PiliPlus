@@ -145,160 +145,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
   }
 
   Widget _buildLiveStrip(ColorScheme colorScheme) {
-    return Obx(() {
-      final state = _dynamicsController.loadingState.value;
-      if (state is! Success<FollowUpModel>) {
-        return const SizedBox.shrink();
-      }
-      final items = state.response.liveUsers?.items;
-      if (items == null || items.isEmpty) {
-        return const SizedBox.shrink();
-      }
-      return Container(
-        margin: const .only(top: 6, bottom: 6),
-        child: Column(
-          crossAxisAlignment: .start,
-          mainAxisSize: .min,
-          children: [
-            Padding(
-              padding: const .symmetric(horizontal: 14, vertical: 4),
-              child: Row(
-                children: [
-                  Container(
-                    width: 7,
-                    height: 7,
-                    margin: const .only(right: 6),
-                    decoration: BoxDecoration(
-                      color: colorScheme.primary,
-                      shape: .circle,
-                    ),
-                  ),
-                  Text(
-                    '正在直播 (${items.length})',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: .w600,
-                      color: colorScheme.onSurface,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 82,
-              child: ListView.separated(
-                scrollDirection: .horizontal,
-                padding: const .symmetric(horizontal: 14),
-                itemCount: items.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 10),
-                itemBuilder: (context, index) {
-                  final item = items[index];
-                  return Material(
-                    color: Pref.modernCardUi
-                        ? colorScheme.surface
-                        : colorScheme.surfaceContainerLow,
-                    borderRadius: .circular(14),
-                    clipBehavior: .antiAlias,
-                    child: InkWell(
-                      onTap: () {
-                        if (item.roomId != null) {
-                          PageUtils.toLiveRoom(item.roomId);
-                        }
-                      },
-                      child: Container(
-                        width: 196,
-                        padding: const .symmetric(horizontal: 10, vertical: 8),
-                        child: Row(
-                          children: [
-                            Stack(
-                              clipBehavior: .none,
-                              children: [
-                                Container(
-                                  padding: const .all(2),
-                                  decoration: BoxDecoration(
-                                    shape: .circle,
-                                    border: .all(
-                                      color: colorScheme.primary,
-                                      width: 1.5,
-                                    ),
-                                  ),
-                                  child: NetworkImgLayer(
-                                    src: item.face,
-                                    width: 38,
-                                    height: 38,
-                                    type: ImageType.avatar,
-                                  ),
-                                ),
-                                Positioned(
-                                  bottom: -2,
-                                  left: 0,
-                                  right: 0,
-                                  child: Center(
-                                    child: Container(
-                                      padding: const .symmetric(
-                                        horizontal: 4,
-                                        vertical: 1,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: colorScheme.primary,
-                                        borderRadius: .circular(4),
-                                      ),
-                                      child: Text(
-                                        'LIVE',
-                                        style: TextStyle(
-                                          fontSize: 8,
-                                          fontWeight: .bold,
-                                          color: colorScheme.onPrimary,
-                                          height: 1.1,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(width: 10),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: .start,
-                                mainAxisAlignment: .center,
-                                children: [
-                                  Text(
-                                    item.uname ?? '',
-                                    maxLines: 1,
-                                    overflow: .ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: .w600,
-                                      color: colorScheme.onSurface,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 3),
-                                  Text(
-                                    item.title ?? '直播中',
-                                    maxLines: 2,
-                                    overflow: .ellipsis,
-                                    style: TextStyle(
-                                      fontSize: 11.5,
-                                      height: 1.25,
-                                      color: colorScheme.onSurfaceVariant,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      );
-    });
+    return Obx(() { final followUp = switch (_dynamicsController.loadingState.value) { Success(:final response) => response, _ => null }; final liveItems = followUp?.liveUsers?.items ?? const <LiveUserItem>[]; final upList = followUp?.upList ?? const <UpItem>[]; if (liveItems.isEmpty && upList.isEmpty) { return const SizedBox.shrink(); } final liveUids = liveItems.map((e) => e.uid).toSet(); final dedupUpList = upList.where((e) => !liveUids.contains(e.mid)).toList(); return SizedBox(height: 78, child: ListView.separated(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 14), itemCount: 1 + liveItems.length + dedupUpList.length, separatorBuilder: (_, _) => const SizedBox(width: 12), itemBuilder: (context, index) { if (index == 0) { return GestureDetector(onTap: () => _dynamicsController.onSelectUp(-1), child: SizedBox(width: 56, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Container(width: 48, height: 48, decoration: BoxDecoration(color: colorScheme.secondaryContainer, shape: BoxShape.circle), child: Icon(Icons.apps_rounded, size: 22, color: colorScheme.onSecondaryContainer)), const SizedBox(height: 4), Text('全部', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant))]))); } if (index <= liveItems.length) { final item = liveItems[index - 1]; return GestureDetector(onTap: () => PageUtils.toLiveRoom(item.roomId), child: SizedBox(width: 56, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [Container(width: 48, height: 48, padding: const EdgeInsets.all(2), decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: colorScheme.primary, width: 2)), child: NetworkImgLayer(width: 44, height: 44, type: ImageType.avatar, src: item.face)), Positioned(bottom: -3, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: colorScheme.primary, borderRadius: BorderRadius.circular(4)), child: Text('LIVE', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: colorScheme.onPrimary, height: 1.0))))]), const SizedBox(height: 4), Text(item.uname ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant))]))); } final item = dedupUpList[index - 1 - liveItems.length]; return GestureDetector(onTap: () => _dynamicsController.onSelectUp(item.mid), child: SizedBox(width: 56, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(clipBehavior: Clip.none, children: [NetworkImgLayer(width: 48, height: 48, type: ImageType.avatar, src: item.face), if (item.hasUpdate == true) Positioned(top: 0, right: 0, child: Container(width: 10, height: 10, decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle, border: Border.all(color: colorScheme.surface, width: 1.5))))]), const SizedBox(height: 4), Text(item.uname ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant))]))); })); });
   }
 
   void _showSearchUpSheet(BuildContext context) {
@@ -522,13 +369,13 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
       appBar: PreferredSize(
-        preferredSize: .fromHeight(isModern ? 98 : 50),
+        preferredSize: .fromHeight(isModern ? 94 : 50),
         child: isModern
             ? Column(
                 crossAxisAlignment: .start,
                 children: [
-                  Padding(
-                    padding: const .fromLTRB(18, 10, 14, 2),
+                  Container(
+                    padding: const .fromLTRB(18, 8, 14, 0), height: 50,
                     child: Row(
                       children: [
                         Text(
@@ -537,7 +384,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
                             fontSize: 26,
                             fontWeight: .w800,
                             letterSpacing: -0.5,
-                            color: colorScheme.onSurface,
+                            color: colorScheme.onSurface, height: 1.1,
                           ),
                         ),
                         const Spacer(),
