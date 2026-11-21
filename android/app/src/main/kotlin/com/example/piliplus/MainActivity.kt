@@ -91,6 +91,13 @@ PackageManager.DONT_KILL_APP,
 )
 }
 result.success(true)
+} else if (call.method == "getAnimatorDurationScale") {
+            val scale = android.provider.Settings.Global.getFloat(
+                contentResolver,
+                android.provider.Settings.Global.ANIMATOR_DURATION_SCALE,
+                1.0f
+                ).toDouble()
+            result.success(scale)
             } else {
                 result.notImplemented()
             }
