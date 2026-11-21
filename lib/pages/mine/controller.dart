@@ -38,6 +38,7 @@ class MineController extends GetxController with AccountMixin {
   final Rx<UserInfoData> userInfo = UserInfoData().obs;
   // 用户状态 动态、关注、粉丝
   final Rx<UserStat> userStat = const UserStat().obs;
+  final Rxn<HistoryItemModel> latestHistory = Rxn<HistoryItemModel>();
 
   final Rx<ThemeType> themeType = Pref.themeType.obs;
 
@@ -121,6 +122,7 @@ class MineController extends GetxController with AccountMixin {
       queryUserInfo();
       tabCtr().forEach((ctr) => ctr.queryData());
     }
+    loadLatestHistory();
   }
 
   bool get isLogin => accountService.isLogin.value;
@@ -305,11 +307,32 @@ class MineController extends GetxController with AccountMixin {
     if (isManual) {
       queryUserInfo();
     }
+    loadLatestHistory();
     return Future.wait(
       tabCtr().map((ctr) => ctr.onRefresh(isManual: isManual)),
     );
   }
 
+    Future<void> loadLatestHistory() async {
+      if (!Pref.modernCardUi) return;
+      try {
+final state = historyCtr?.loadingState.value;
+        if (state is Success<List<HistoryItemModel>> && state.response.isNotEmpty) {
+  latestHistory.value = state.response.first;
+  return;
+}
+if (!Accounts.history.isLogin) return;
+final res = await UserHttp.historyList(
+  type: 'all',
+  ps: 1,
+  account: Accounts.history,
+);
+if (res is Success<HistoryData> && (res.response.list?.isNotEmpty ?? false)) {
+  latestHistory.value = res.response.list!.first;
+}
+} catch (_) {}
+    }
+  
   @override
   void onChangeAccount(bool isLogin) {
     if (isLogin) {
