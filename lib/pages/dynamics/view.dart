@@ -20,7 +20,6 @@ import 'package:PiliPlus/utils/extension/get_ext.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
-import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart' hide DraggableScrollableSheet;
 
@@ -33,7 +32,6 @@ class DynamicsPage extends StatefulWidget {
 
 class _DynamicsPageState extends CommonPageState<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
-  bool _showUpStrip = true;
   static const String _liveFirstLayoutKey = 'dynLiveFirstLayout';
 
   final _dynamicsController = Get.putOrFind(DynamicsController.new);
@@ -59,10 +57,10 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     required IconData icon,
     required String tooltip,
     required VoidCallback onPressed,
-    bool primary = false,
+    bool primary = false, double size = 38, double iconSize = 20,
   }) => Container(
-    width: 38,
-    height: 38,
+    width: size,
+    height: size,
     decoration: BoxDecoration(
       color: primary ? colorScheme.primary : colorScheme.surface,
       shape: .circle,
@@ -79,7 +77,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
       onPressed: onPressed,
       icon: Icon(
         icon,
-        size: 20,
+        size: iconSize,
         color: primary ? colorScheme.onPrimary : colorScheme.onSurface,
       ),
     ),
@@ -147,7 +145,6 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     );
   }
 
-  Widget _buildAnimatedUpStrip(ColorScheme colorScheme) { if (_mainController.barOffset case final barOffset?) { return Obx(() { final offset = (barOffset.value / 50.0 * 78.0).clamp(0.0, 78.0); return CustomHeightWidget(offset: Offset(0, -offset), height: (78.0 - offset).clamp(0.0, 78.0), child: _buildLiveStrip(colorScheme)); }); } return AnimatedSize(duration: const Duration(milliseconds: 220), curve: Curves.easeOutCubic, child: _showUpStrip ? _buildLiveStrip(colorScheme) : const SizedBox(width: double.infinity, height: 0)); }
   Widget _buildLiveStrip(ColorScheme colorScheme) {
     return Obx(() { final followUp = switch (_dynamicsController.loadingState.value) { Success(:final response) => response, _ => null }; final liveItems = followUp?.liveUsers?.items ?? const <LiveUserItem>[]; final upList = followUp?.upList ?? const <UpItem>[]; if (liveItems.isEmpty && upList.isEmpty) { return const SizedBox.shrink(); } final liveUids = liveItems.map((e) => e.mid).toSet(); final dedupUpList = upList.where((e) => !liveUids.contains(e.mid)).toList(); return SizedBox(height: 78, child: ListView.separated(scrollDirection: Axis.horizontal, padding: const EdgeInsets.symmetric(horizontal: 14), itemCount: 1 + liveItems.length + dedupUpList.length, separatorBuilder: (_, _) => const SizedBox(width: 12), itemBuilder: (context, index) { if (index == 0) { return GestureDetector(onTap: () => _dynamicsController.onSelectUp(-1), child: SizedBox(width: 56, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Container(width: 48, height: 48, decoration: BoxDecoration(color: colorScheme.secondaryContainer, shape: BoxShape.circle), child: Icon(Icons.apps_rounded, size: 22, color: colorScheme.onSecondaryContainer)), const SizedBox(height: 4), Text('全部', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant))]))); } if (index <= liveItems.length) { final item = liveItems[index - 1]; return GestureDetector(onTap: () => PageUtils.toLiveRoom(item.roomId), child: SizedBox(width: 56, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(clipBehavior: Clip.none, alignment: Alignment.center, children: [Container(width: 48, height: 48, padding: const EdgeInsets.all(2), decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: colorScheme.primary, width: 2)), child: NetworkImgLayer(width: 44, height: 44, type: ImageType.avatar, src: item.face)), Positioned(bottom: -3, child: Container(padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1), decoration: BoxDecoration(color: colorScheme.primary, borderRadius: BorderRadius.circular(4)), child: Text('LIVE', style: TextStyle(fontSize: 8, fontWeight: FontWeight.w800, color: colorScheme.onPrimary, height: 1.0))))]), const SizedBox(height: 4), Text(item.uname ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant))]))); } final item = dedupUpList[index - 1 - liveItems.length]; return GestureDetector(onTap: () => _dynamicsController.onSelectUp(item.mid), child: SizedBox(width: 56, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Stack(clipBehavior: Clip.none, children: [NetworkImgLayer(width: 48, height: 48, type: ImageType.avatar, src: item.face), if (item.hasUpdate == true) Positioned(top: 0, right: 0, child: Container(width: 10, height: 10, decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle, border: Border.all(color: colorScheme.surface, width: 1.5))))]), const SizedBox(height: 4), Text(item.uname ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 11, color: colorScheme.onSurfaceVariant))]))); })); });
   }
@@ -275,19 +272,12 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     final tabView = tabBarView(
       controller: _dynamicsController.tabController,
       children: _dynamicsController.tabs
-          .map((e) => DynamicsTabPage(dynamicsType: e))
+          .map((e) => DynamicsTabPage(dynamicsType: e, upStripBuilder: (isModern || _useLiveFirstLayout) ? (_) => _buildLiveStrip(colorScheme) : null))
           .toList(),
     );
 
-    Widget child = (isModern || _useLiveFirstLayout)
-        ? Column(
-            children: [
-              _buildAnimatedUpStrip(colorScheme),
-              Expanded(child: NotificationListener<UserScrollNotification>(onNotification: (notification) { if (notification.direction == ScrollDirection.reverse && _showUpStrip) { setState(() => _showUpStrip = false); } else if (notification.direction == ScrollDirection.forward && !_showUpStrip) { setState(() => _showUpStrip = true); } return false; }, child: tabView)),
-            ],
-          )
-        : tabView;
-
+    Widget child = tabView;
+    
     if (!isModern) {
       if (_useLiveFirstLayout) {
         actions = _actionPill(colorScheme);
@@ -375,10 +365,10 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
       appBar: PreferredSize(
         preferredSize: .fromHeight(isModern ? 94 : 50),
         child: isModern
-            ? Column(
+            ? Builder(builder: (context) { Widget buildHeader(double offset) => Material(color: Theme.of(context).scaffoldBackgroundColor, child: Column(mainAxisSize: .min,
                 crossAxisAlignment: .start,
                 children: [
-                  Container(
+                  ClipRect(child: CustomHeightWidget(offset: Offset(0, -offset), height: (50.0 - offset).clamp(0.0, 50.0), child: Container(
                     padding: const .fromLTRB(18, 8, 14, 0), height: 50,
                     child: Row(
                       children: [
@@ -409,10 +399,10 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
                       ],
                     ),
                   ),
-                  SizedBox(height: 44, child: tabBar),
+                  ),), SizedBox(height: 44, child: Row(children: [Expanded(child: tabBar), if (offset > 2) Opacity(opacity: (offset / 50.0).clamp(0.0, 1.0), child: Row(mainAxisSize: .min, children: [_circleIconBtn(colorScheme, icon: Icons.search, tooltip: '搜索关注的 UP 主', size: 32, iconSize: 17, onPressed: () => _showSearchUpSheet(context)), const SizedBox(width: 6), _circleIconBtn(colorScheme, icon: Icons.add, tooltip: '发布动态', primary: true, size: 32, iconSize: 17, onPressed: () => CreateDynPanel.onCreateDyn(context)), const SizedBox(width: 12)]))])),
                 ],
               )
-            : Row(
+            ); if (_mainController.barOffset case final barOffset?) { return Obx(() => buildHeader(barOffset.value.clamp(0.0, 50.0))); } return buildHeader(0.0); }) : Row(
                 children: [
                   ?leading,
                   Expanded(child: tabBar),
