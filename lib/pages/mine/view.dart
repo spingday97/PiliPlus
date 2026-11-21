@@ -24,6 +24,7 @@ import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -167,6 +168,9 @@ class _MediaPageState extends CommonPageState<MinePage>
                       hasCustomBg,
                     ),
                     _buildUserStatsRow(theme, secondary),
+if (Pref.modernCardUi)
+  _buildBentoGrid(theme)
+else
                     _buildActions(secondary),
                     for (final tab in controller.mineTabs)
                       switch (tab) {
@@ -209,6 +213,131 @@ class _MediaPageState extends CommonPageState<MinePage>
       );
     }
     return content;
+  }
+
+  Widget _buildBentoGrid(ThemeData theme) {
+    final cs = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: _buildBentoTile(
+                  title: '观看历史',
+                  icon: Icons.history_rounded,
+                  bgColor: cs.primaryContainer.withValues(alpha: 0.55),
+                  fgColor: cs.primary,
+                  onTap: () => Get.toNamed('/history'),
+                  isLarge: true,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBentoTile(
+                  title: '我的收藏',
+                  icon: Icons.star_rounded,
+                  bgColor: cs.secondaryContainer.withValues(alpha: 0.65),
+                  fgColor: cs.secondary,
+                  onTap: () => Get.toNamed('/fav'),
+                  isLarge: true,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBentoTile(
+                  title: '离线缓存',
+                  icon: Icons.download_rounded,
+                  bgColor: Colors.teal.withValues(alpha: 0.12),
+                  fgColor: Colors.teal,
+                  onTap: () => Get.toNamed('/download'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBentoTile(
+                  title: '我的订阅',
+                  icon: Icons.subscriptions_rounded,
+                  bgColor: Colors.orange.withValues(alpha: 0.12),
+                  fgColor: Colors.orange,
+                  onTap: () => Get.toNamed('/subscription'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildBentoTile(
+                  title: '稍后再看',
+                  icon: Icons.watch_later_rounded,
+                  bgColor: Colors.indigo.withValues(alpha: 0.12),
+                  fgColor: Colors.indigo,
+                  onTap: () => Get.toNamed('/later'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildBentoTile(
+                  title: '外观设置',
+                  icon: Icons.palette_rounded,
+                  bgColor: Colors.pink.withValues(alpha: 0.12),
+                  fgColor: Colors.pink,
+                  onTap: () => Get.toNamed('/styleSetting'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBentoTile({
+    required String title,
+    required IconData icon,
+    required Color bgColor,
+    required Color fgColor,
+    required VoidCallback onTap,
+    bool isLarge = false,
+  }) {
+    return Material(
+      color: bgColor,
+      borderRadius: BorderRadius.circular(isLarge ? 20 : 16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(isLarge ? 20 : 16),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: isLarge ? 20 : 14,
+          ),
+          child: Row(
+            children: [
+              Icon(icon, color: fgColor, size: isLarge ? 26 : 22),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: isLarge ? 15 : 14,
+                    fontWeight: FontWeight.w600,
+                    color: fgColor,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildTopBannerAndUser(
