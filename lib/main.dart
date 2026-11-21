@@ -32,6 +32,7 @@ import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/theme_utils.dart';
+import 'package:PiliPlus/utils/update.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:catcher_2/catcher_2.dart';
 import 'package:collection/collection.dart';
@@ -52,6 +53,7 @@ import 'package:window_manager/window_manager.dart';
 WebViewEnvironment? webViewEnvironment;
 
 EdgeInsets? tmpPadding;
+double _animatorScale = 1.0;
 
 Future<void> _initDownPath() async {
   if (PlatformUtils.isDesktop) {
@@ -93,7 +95,19 @@ Future<void> _initAppPath() async {
 
 void main() async {
   ScaledWidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
+  Future.microtask(() async {
+    await Update.cleanUpOldApk();
+    if (Platform.isAndroid) {
+      try {
+        final scale = await const MethodChannel('piliplus/install')
+              .invokeMethod<double>('getAnimatorDurationScale');
+    if (scale != null && scale >= 0) {
+      _animatorScale = scale;
+    }
+        } catch (_) {}
+    }
+    });
+    MediaKit.ensureInitialized();
   await _initAppPath();
   try {
     await GStorage.init();
@@ -333,7 +347,8 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [Locale("zh", "CN"), Locale("en", "US")],
       initialRoute: '/',
       getPages: Routes.getPages,
-      defaultTransition: Pref.pageTransition,
+      transitionDuration: Duration(milliseconds: (260 * _animatorScale).round().clamp(0, 600)),
+      defaultTransition: Pref.modernCardUi && Pref.pageTransition == Transition.native ? Transition.cupertino : Pref.pageTransition,
       builder: FlutterSmartDialog.init(
         toastBuilder: CustomToast.new,
         loadingBuilder: LoadingWidget.new,
