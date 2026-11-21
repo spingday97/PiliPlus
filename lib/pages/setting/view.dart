@@ -11,6 +11,7 @@ import 'package:PiliPlus/pages/setting/widgets/multi_select_dialog.dart';
 import 'package:PiliPlus/pages/webdav/view.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/accounts/account.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
@@ -176,6 +177,9 @@ class _SettingPageState extends State<SettingPage> {
     TextStyle subTitleStyle = theme.textTheme.labelMedium!.copyWith(
       color: theme.colorScheme.outline,
     );
+    if (Pref.modernCardUi) {
+      return _buildModernList(theme, padding, titleStyle, subTitleStyle);
+    }
     return ListView(
       padding: EdgeInsets.only(bottom: padding.bottom + 100),
       children: [
@@ -295,6 +299,146 @@ class _SettingPageState extends State<SettingPage> {
           ],
         );
       },
+    );
+  }
+
+    Widget _buildModernList(
+    ThemeData theme,
+    EdgeInsets padding,
+    TextStyle titleStyle,
+    TextStyle subTitleStyle,
+  ) {
+    _SettingsModel itemOf(SettingType type) =>
+        _items.firstWhere((e) => e.type == type);
+
+    Widget buildTile({
+      required Widget icon,
+      required String title,
+      String? subtitle,
+      required VoidCallback onTap,
+      Color? iconColor,
+      bool selected = false,
+    }) {
+      final color = iconColor ?? theme.colorScheme.primary;
+      return ListTile(
+        selected: selected,
+        tileColor: selected ? theme.colorScheme.onInverseSurface : null,
+        onTap: onTap,
+        leading: Container(
+          width: 36,
+          height: 36,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: IconTheme(
+            data: IconThemeData(color: color, size: 20),
+            child: icon,
+          ),
+        ),
+        title: Text(title, style: titleStyle),
+        subtitle: subtitle == null ? null : Text(subtitle, style: subTitleStyle),
+        trailing: const Icon(Icons.chevron_right, size: 18),
+      );
+    }
+
+    Widget buildSettingTile(SettingType type, String title) {
+      final item = itemOf(type);
+      return buildTile(
+        icon: item.icon,
+        title: title,
+        subtitle: item.subtitle,
+        selected: !_isPortrait && _type == type,
+        onTap: () => _toPage(type),
+      );
+    }
+
+    Widget buildGroup(String title, List<Widget> children) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
+              child: Text(
+                title,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: theme.colorScheme.outline.withValues(alpha: 0.12),
+                  width: 0.7,
+                ),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(children: children),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return ListView(
+      padding: EdgeInsets.only(bottom: padding.bottom + 100),
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
+          child: Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: theme.colorScheme.outline.withValues(alpha: 0.12),
+                width: 0.7,
+              ),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: _buildSearchItem(theme),
+          ),
+        ),
+        buildGroup('外观与交互', [
+          buildSettingTile(SettingType.styleSetting, '外观与界面'),
+          buildSettingTile(SettingType.dynSetting, '动态与动态流'),
+          buildSettingTile(SettingType.recommendSetting, '推荐与首页'),
+        ]),
+        buildGroup('播放与体验', [
+          buildSettingTile(SettingType.videoSetting, '音视频解码'),
+          buildSettingTile(SettingType.playSetting, '播放控制'),
+          buildSettingTile(SettingType.dmSetting, '弹幕设置'),
+          buildSettingTile(SettingType.replySetting, '评论设置'),
+        ]),
+        buildGroup('账号与安全', [
+          buildSettingTile(SettingType.privacySetting, '隐私与账号'),
+          buildSettingTile(SettingType.webdavSetting, 'WebDAV 备份'),
+          buildTile(
+            icon: const Icon(Icons.switch_account_outlined),
+            title: '切换账号',
+            onTap: () => LoginPageController.switchAccountDialog(context),
+          ),
+          Obx(
+            () => _noAccount.value
+                ? const SizedBox.shrink()
+                : buildTile(
+                    icon: const Icon(Icons.logout_outlined),
+                    iconColor: theme.colorScheme.error,
+                    title: '退出登录',
+                    onTap: () => _logoutDialog(context),
+                  ),
+          ),
+        ]),
+        buildGroup('系统与关于', [
+          buildSettingTile(SettingType.extraSetting, '更多设置'),
+          buildSettingTile(SettingType.about, '关于与检查更新'),
+        ]),
+      ],
     );
   }
 
