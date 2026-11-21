@@ -169,7 +169,7 @@ class _MediaPageState extends CommonPageState<MinePage>
                     ),
                     _buildUserStatsRow(theme, secondary),
 if (Pref.modernCardUi)
-  _buildBentoGrid(theme)
+  (theme)
 else
                     _buildActions(secondary),
                     for (final tab in controller.mineTabs)
@@ -215,89 +215,8 @@ else
     return content;
   }
 
-  Widget _buildBentoGrid(ThemeData theme) {
-    final cs = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: _buildBentoTile(
-                  title: '观看历史',
-                  icon: Icons.history_rounded,
-                  bgColor: cs.primaryContainer.withValues(alpha: 0.55),
-                  fgColor: cs.primary,
-                  onTap: () => Get.toNamed('/history'),
-                  isLarge: true,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildBentoTile(
-                  title: '我的收藏',
-                  icon: Icons.star_rounded,
-                  bgColor: cs.secondaryContainer.withValues(alpha: 0.65),
-                  fgColor: cs.secondary,
-                  onTap: () => Get.toNamed('/fav'),
-                  isLarge: true,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildBentoTile(
-                  title: '离线缓存',
-                  icon: Icons.download_rounded,
-                  bgColor: Colors.teal.withValues(alpha: 0.12),
-                  fgColor: Colors.teal,
-                  onTap: () => Get.toNamed('/download'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildBentoTile(
-                  title: '我的订阅',
-                  icon: Icons.subscriptions_rounded,
-                  bgColor: Colors.orange.withValues(alpha: 0.12),
-                  fgColor: Colors.orange,
-                  onTap: () => Get.toNamed('/subscription'),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: _buildBentoTile(
-                  title: '稍后再看',
-                  icon: Icons.watch_later_rounded,
-                  bgColor: Colors.indigo.withValues(alpha: 0.12),
-                  fgColor: Colors.indigo,
-                  onTap: () => Get.toNamed('/later'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: _buildBentoTile(
-                  title: '系统设置',
-                  icon: Icons.settings_rounded,
-                  bgColor: Colors.pink.withValues(alpha: 0.12),
-                  fgColor: Colors.pink,
-                  onTap: () => Get.toNamed('/setting'),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
+  
+    Widget _buildBentoGrid(ThemeData theme) { final isDark = theme.brightness == Brightness.dark; final cs = theme.colorScheme; final historyBg = isDark ? cs.secondaryContainer : const Color(0xFF5F748D); final historyFg = isDark ? cs.onSecondaryContainer : Colors.white; final downloadBg = isDark ? cs.surfaceContainerHighest : const Color(0xFF43556B); final downloadFg = isDark ? cs.onSurface : Colors.white; final laterBg = isDark ? cs.surfaceContainerHighest : const Color(0xFFE6DFD5); final laterFg = isDark ? cs.onSurface : const Color(0xFF2B2D30); final subBg = isDark ? cs.surfaceContainerHighest : const Color(0xFF6D829B); final subFg = isDark ? cs.onSurface : Colors.white; final settingBg = isDark ? cs.surfaceContainerHighest : const Color(0xFFEAE3DA); final settingFg = isDark ? cs.onSurface : const Color(0xFF2B2D30); return Padding(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), child: Column(children: [Row(children: [Expanded(flex: 5, child: Material(color: historyBg, borderRadius: BorderRadius.circular(20), clipBehavior: Clip.antiAlias, child: InkWell(onTap: () => Get.toNamed('/history'), child: SizedBox(height: 152, child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Icon(Icons.history_rounded, color: historyFg, size: 28), const SizedBox(height: 10), Text('观看历史', style: TextStyle(color: historyFg, fontSize: 16, fontWeight: FontWeight.w600))]), ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: 0.62, minHeight: 5, backgroundColor: historyFg.withValues(alpha: 0.2), valueColor: AlwaysStoppedAnimation<Color>(historyFg.withValues(alpha: 0.85))))])))))), const SizedBox(width: 10), Expanded(flex: 6, child: Column(children: [SizedBox(height: 71, child: _buildBentoTile(title: '离线缓存', icon: Icons.download_rounded, bgColor: downloadBg, fgColor: downloadFg, onTap: () => Get.toNamed('/download'))), const SizedBox(height: 10), SizedBox(height: 71, child: _buildBentoTile(title: '稍后再看', icon: Icons.watch_later_outlined, bgColor: laterBg, fgColor: laterFg, onTap: () => Get.toNamed('/later')))]))]), const SizedBox(height: 10), Row(children: [Expanded(child: SizedBox(height: 68, child: _buildBentoTile(title: '我的订阅', icon: Icons.subscriptions_outlined, bgColor: subBg, fgColor: subFg, onTap: () => Get.toNamed('/subscription')))), const SizedBox(width: 10), Expanded(child: SizedBox(height: 68, child: _buildBentoTile(title: '系统设置', icon: Icons.settings_outlined, bgColor: settingBg, fgColor: settingFg, onTap: () => Get.toNamed('/setting'))))]),])); }
 
   Widget _buildBentoTile({
     required String title,
