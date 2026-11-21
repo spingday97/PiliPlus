@@ -51,8 +51,38 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     GStorage.setting.put(_liveFirstLayoutKey, next);
   }
 
+  Widget _circleIconBtn(
+    ColorScheme colorScheme, {
+    required IconData icon,
+    required String tooltip,
+    required VoidCallback onPressed,
+    bool primary = false,
+  }) => Container(
+    width: 38,
+    height: 38,
+    decoration: BoxDecoration(
+      color: primary ? colorScheme.primary : colorScheme.surface,
+      shape: .circle,
+      border: primary
+          ? null
+          : .all(
+              color: colorScheme.outline.withValues(alpha: 0.16),
+              width: 0.8,
+            ),
+    ),
+    child: IconButton(
+      tooltip: tooltip,
+      padding: EdgeInsets.zero,
+      onPressed: onPressed,
+      icon: Icon(
+        icon,
+        size: 20,
+        color: primary ? colorScheme.onPrimary : colorScheme.onSurface,
+      ),
+    ),
+  );
+
   Widget _actionPill(ColorScheme colorScheme, {bool reverse = false}) {
-    final isModern = Pref.modernCardUi;
     final items = <Widget>[
       IconButton(
         tooltip: _useLiveFirstLayout ? '切换为经典动态布局' : '切换为直播优先布局',
@@ -100,7 +130,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
       margin: reverse ? const .only(left: 12) : const .only(right: 14),
       padding: const .symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: isModern ? Colors.white : colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainerLow,
         borderRadius: .circular(18),
         border: .all(
           color: colorScheme.outline.withValues(alpha: 0.22),
@@ -125,7 +155,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
         return const SizedBox.shrink();
       }
       return Container(
-        margin: const .only(top: 6, bottom: 4),
+        margin: const .only(top: 6, bottom: 6),
         child: Column(
           crossAxisAlignment: .start,
           mainAxisSize: .min,
@@ -165,7 +195,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
                   final item = items[index];
                   return Material(
                     color: Pref.modernCardUi
-                        ? Colors.white
+                        ? colorScheme.surface
                         : colorScheme.surfaceContainerLow,
                     borderRadius: .circular(14),
                     clipBehavior: .antiAlias,
@@ -305,7 +335,6 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
   Widget upPanelPart(ColorScheme colorScheme) {
     final isTop = upPanelPosition == .top;
     final needBg = upPanelPosition.index > 2;
-    final isModern = Pref.modernCardUi;
     final panel = Material(
       type: needBg ? .canvas : .transparency,
       color: needBg ? colorScheme.surface : null,
@@ -332,7 +361,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
           ? const .fromLTRB(10, 4, 10, 6)
           : const .fromLTRB(8, 6, 4, 8),
       decoration: BoxDecoration(
-        color: isModern ? Colors.white : colorScheme.surfaceContainerLow,
+        color: colorScheme.surfaceContainerLow,
         borderRadius: .circular(16),
         border: .all(
           color: colorScheme.outline.withValues(alpha: 0.12),
@@ -390,7 +419,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     Widget? endDrawer;
 
     Widget? leading;
-    Widget actions;
+    Widget? actions;
 
     final tabView = tabBarView(
       controller: _dynamicsController.tabController,
@@ -399,7 +428,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
           .toList(),
     );
 
-    Widget child = _useLiveFirstLayout
+    Widget child = (isModern || _useLiveFirstLayout)
         ? Column(
             children: [
               _buildLiveStrip(colorScheme),
@@ -408,100 +437,137 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
           )
         : tabView;
 
-    if (_useLiveFirstLayout) {
-      actions = _actionPill(colorScheme);
-    } else {
-      switch (upPanelPosition) {
-        case .top:
-          child = Column(
-            children: [
-              upPanelPart(colorScheme),
-              Expanded(child: child),
-            ],
-          );
-          actions = _actionPill(colorScheme);
-        case .leftFixed:
-          child = Row(
-            children: [
-              upPanelPart(colorScheme),
-              Expanded(child: child),
-            ],
-          );
-          actions = _actionPill(colorScheme);
-        case .rightFixed:
-          child = Row(
-            children: [
-              Expanded(child: child),
-              upPanelPart(colorScheme),
-            ],
-          );
-          actions = _actionPill(colorScheme);
-        case .leftDrawer:
-          drawer = upPanelPart(colorScheme);
-          actions = _actionPill(colorScheme);
-          leading = const DrawerButton();
-        case .rightDrawer:
-          endDrawer = upPanelPart(colorScheme);
-          leading = _actionPill(colorScheme, reverse: true);
-          actions = const EndDrawerButton();
+    if (!isModern) {
+      if (_useLiveFirstLayout) {
+        actions = _actionPill(colorScheme);
+      } else {
+        switch (upPanelPosition) {
+          case .top:
+            child = Column(
+              children: [
+                upPanelPart(colorScheme),
+                Expanded(child: child),
+              ],
+            );
+            actions = _actionPill(colorScheme);
+          case .leftFixed:
+            child = Row(
+              children: [
+                upPanelPart(colorScheme),
+                Expanded(child: child),
+              ],
+            );
+            actions = _actionPill(colorScheme);
+          case .rightFixed:
+            child = Row(
+              children: [
+                Expanded(child: child),
+                upPanelPart(colorScheme),
+              ],
+            );
+            actions = _actionPill(colorScheme);
+          case .leftDrawer:
+            drawer = upPanelPart(colorScheme);
+            actions = _actionPill(colorScheme);
+            leading = const DrawerButton();
+          case .rightDrawer:
+            endDrawer = upPanelPart(colorScheme);
+            leading = _actionPill(colorScheme, reverse: true);
+            actions = const EndDrawerButton();
+        }
       }
     }
+
+    final tabBar = TabBar(
+      dividerHeight: 0,
+      isScrollable: true,
+      tabAlignment: .start,
+      padding: isModern ? const .symmetric(horizontal: 14) : EdgeInsets.zero,
+      dividerColor: Colors.transparent,
+      indicatorSize: isModern
+          ? TabBarIndicatorSize.tab
+          : TabBarIndicatorSize.label,
+      indicatorWeight: isModern ? 0 : 3,
+      indicatorPadding: isModern
+          ? const .symmetric(vertical: 6)
+          : EdgeInsets.zero,
+      indicator: isModern
+          ? BoxDecoration(
+              color: colorScheme.primary,
+              borderRadius: .circular(18),
+            )
+          : null,
+      indicatorColor: colorScheme.primary,
+      labelColor: isModern ? colorScheme.onPrimary : colorScheme.primary,
+      controller: _dynamicsController.tabController,
+      unselectedLabelColor: colorScheme.onSurface,
+      labelStyle: const TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+      unselectedLabelStyle: const TextStyle(
+        fontSize: 15,
+        fontWeight: FontWeight.normal,
+      ),
+      tabs: _dynamicsController.tabs.map((e) => Tab(text: e.label)).toList(),
+      onTap: (index) {
+        if (!_dynamicsController.tabController.indexIsChanging) {
+          _dynamicsController.animateToTop();
+        }
+      },
+    );
 
     return Scaffold(
       primary: false,
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
       appBar: PreferredSize(
-        preferredSize: const .fromHeight(50),
-        child: Row(
-          children: [
-            ?leading,
-            Expanded(
-              child: TabBar(
-                dividerHeight: 0,
-                isScrollable: true,
-                tabAlignment: .start,
-                dividerColor: Colors.transparent,
-                indicatorSize: isModern
-                    ? TabBarIndicatorSize.tab
-                    : TabBarIndicatorSize.label,
-                indicatorWeight: isModern ? 0 : 3,
-                indicatorPadding: isModern
-                    ? const .symmetric(vertical: 7)
-                    : EdgeInsets.zero,
-                indicator: isModern
-                    ? BoxDecoration(
-                        color: colorScheme.secondaryContainer,
-                        borderRadius: .circular(18),
-                      )
-                    : null,
-                indicatorColor: colorScheme.primary,
-                labelColor: isModern
-                    ? colorScheme.onSecondaryContainer
-                    : colorScheme.primary,
-                controller: _dynamicsController.tabController,
-                unselectedLabelColor: colorScheme.onSurface,
-                labelStyle: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-                unselectedLabelStyle: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.normal,
-                ),
-                tabs: _dynamicsController.tabs
-                    .map((e) => Tab(text: e.label))
-                    .toList(),
-                onTap: (index) {
-                  if (!_dynamicsController.tabController.indexIsChanging) {
-                    _dynamicsController.animateToTop();
-                  }
-                },
+        preferredSize: .fromHeight(isModern ? 98 : 50),
+        child: isModern
+            ? Column(
+                crossAxisAlignment: .start,
+                children: [
+                  Padding(
+                    padding: const .fromLTRB(18, 10, 14, 2),
+                    child: Row(
+                      children: [
+                        Text(
+                          '动态',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: .w800,
+                            letterSpacing: -0.5,
+                            color: colorScheme.onSurface,
+                          ),
+                        ),
+                        const Spacer(),
+                        _circleIconBtn(
+                          colorScheme,
+                          icon: Icons.search,
+                          tooltip: '搜索关注的 UP 主',
+                          onPressed: () => _showSearchUpSheet(context),
+                        ),
+                        const SizedBox(width: 8),
+                        _circleIconBtn(
+                          colorScheme,
+                          icon: Icons.add,
+                          tooltip: '发布动态',
+                          primary: true,
+                          onPressed: () => CreateDynPanel.onCreateDyn(context),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 44, child: tabBar),
+                ],
+              )
+            : Row(
+                children: [
+                  ?leading,
+                  Expanded(child: tabBar),
+                  ?actions,
+                ],
               ),
-            ),
-            actions,
-          ],
-        ),
       ),
       drawer: drawer,
       endDrawer: endDrawer,
