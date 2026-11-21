@@ -169,7 +169,7 @@ class _MediaPageState extends CommonPageState<MinePage>
                     ),
                     _buildUserStatsRow(theme, secondary),
 if (Pref.modernCardUi)
-  (theme)
+  _buildBentoGrid(theme)
 else
                     _buildActions(secondary),
                     for (final tab in controller.mineTabs)
