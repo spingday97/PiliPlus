@@ -8,7 +8,6 @@ import 'package:PiliPlus/pages/about/view.dart';
 import 'package:PiliPlus/pages/login/controller.dart';
 import 'package:PiliPlus/pages/setting/common_setting.dart';
 import 'package:PiliPlus/pages/setting/widgets/multi_select_dialog.dart';
-import 'package:PiliPlus/pages/webdav/view.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/accounts/account.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
@@ -90,10 +89,6 @@ class _SettingPageState extends State<SettingPage> {
       icon: Icon(Icons.extension_outlined),
     ),
     _SettingsModel(
-      type: .webdavSetting,
-      icon: Icon(MdiIcons.databaseCogOutline),
-    ),
-    _SettingsModel(
       type: .about,
       icon: Icon(Icons.info_outline),
     ),
@@ -129,9 +124,6 @@ class _SettingPageState extends State<SettingPage> {
                   Expanded(
                     flex: 6,
                     child: switch (_type) {
-                      .webdavSetting => const WebDavSettingPage(
-                        showAppBar: false,
-                      ),
                       .about => const AboutPage(showAppBar: false),
                       _ => CommonSetting(settingType: _type, showAppBar: false),
                     },
@@ -152,7 +144,6 @@ class _SettingPageState extends State<SettingPage> {
     if (_isPortrait) {
       Get.to(
         () => switch (type) {
-          .webdavSetting => const WebDavSettingPage(),
           .about => const AboutPage(),
           _ => CommonSetting(settingType: type),
         },
@@ -417,7 +408,6 @@ class _SettingPageState extends State<SettingPage> {
         ]),
         buildGroup('账号与安全', [
           buildSettingTile(SettingType.privacySetting, '隐私与账号'),
-          buildSettingTile(SettingType.webdavSetting, 'WebDAV 备份'),
           buildTile(
             icon: const Icon(Icons.switch_account_outlined),
             title: '切换账号',
