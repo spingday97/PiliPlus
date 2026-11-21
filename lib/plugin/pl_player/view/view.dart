@@ -1388,17 +1388,17 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         : 0.0,
                     duration: const Duration(milliseconds: 150),
                     child: Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: const BoxDecoration(
-                        color: Color(0x88000000),
-                        borderRadius: BorderRadius.all(Radius.circular(16)),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                      decoration: BoxDecoration(
+                        color: const Color(0xB814171F),
+                        borderRadius: const BorderRadius.all(Radius.circular(999)), border: Border.all(color: Colors.white.withValues(alpha: 0.14), width: 0.8),
                       ),
                       child: Obx(
                         () => Text(
                           '${plPlayerController.enableAutoLongPressSpeed ? (plPlayerController.longPressStatus.value ? plPlayerController.lastPlaybackSpeed : plPlayerController.playbackSpeed) * 2 : plPlayerController.longPressSpeed}倍速中',
                           style: const TextStyle(
                             color: Colors.white,
-                            fontSize: 13,
+                            fontSize: 13, fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
@@ -1482,12 +1482,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                   duration: const Duration(milliseconds: 150),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 5,
+                      horizontal: 14,
+                      vertical: 7,
                     ),
-                    decoration: const BoxDecoration(
-                      color: Color(0x88000000),
-                      borderRadius: BorderRadius.all(Radius.circular(64)),
+                    decoration: BoxDecoration(
+                      color: const Color(0xB814171F),
+                      borderRadius: const BorderRadius.all(Radius.circular(999)), border: Border.all(color: Colors.white.withValues(alpha: 0.14), width: 0.8),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -1506,7 +1506,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                         Text(
                           '${(volume * 100.0).round()}%',
                           style: const TextStyle(
-                            fontSize: 13.0,
+                            fontSize: 13.0, fontWeight: FontWeight.w500,
                             color: Colors.white,
                           ),
                         ),
@@ -1531,12 +1531,12 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                 duration: const Duration(milliseconds: 150),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 5,
+                    horizontal: 14,
+                    vertical: 7,
                   ),
-                  decoration: const BoxDecoration(
-                    color: Color(0x88000000),
-                    borderRadius: BorderRadius.all(Radius.circular(64)),
+                  decoration: BoxDecoration(
+                    color: const Color(0xB814171F),
+                    borderRadius: const BorderRadius.all(Radius.circular(999)), border: Border.all(color: Colors.white.withValues(alpha: 0.14), width: 0.8),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -1555,7 +1555,7 @@ class _PLVideoPlayerState extends State<PLVideoPlayer>
                       Text(
                         '${(_brightnessValue.value * 100.0).round()}%',
                         style: const TextStyle(
-                          fontSize: 13.0,
+                          fontSize: 13.0, fontWeight: FontWeight.w500,
                           color: Colors.white,
                         ),
                       ),
