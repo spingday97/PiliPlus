@@ -1,3 +1,4 @@
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'dart:io' show Platform;
 import 'dart:math';
 
@@ -1318,14 +1319,16 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     Widget tabBar() {
       final flag = !needIndicator || tabs.length == 1;
-      return TabBar(
+      final isModern = Pref.modernCardUi && !flag;
+        return TabBar(
         padding: .zero,
         dividerHeight: 0,
         labelPadding: .zero,
         dividerColor: Colors.transparent,
-        controller: videoDetailController.tabCtr,
-        indicator: flag ? const BoxDecoration() : null,
-        labelColor: flag ? colorScheme.onSurface : null,
+        indicatorSize: isModern ? TabBarIndicatorSize.tab : null,
+            controller: videoDetailController.tabCtr,
+        indicatorPadding: isModern ? const .symmetric(vertical: 6, horizontal: 4) : .zero, indicator: flag ? const BoxDecoration() : isModern ? BoxDecoration(color: colorScheme.primary, borderRadius: .circular(18)) : null,
+        labelColor: flag ? colorScheme.onSurface : isModern ? colorScheme.onPrimary : null, unselectedLabelColor: isModern ? colorScheme.onSurfaceVariant : null,
         labelStyle:
             TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 13) ??
             const TextStyle(fontSize: 13),
