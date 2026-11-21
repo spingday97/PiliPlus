@@ -53,14 +53,6 @@ List<SettingsModel> get extraSettings => [
       onTap: _showDownPathDialog,
     ),
   ] else if (Platform.isAndroid)
-    SwitchModel(
-      title: '允许三方APP访问私有存储',
-      subtitle: '允许三方APP（例如MT管理器）通过访问外部存储的方式访问私有存储下的文件',
-      leading: const Icon(Icons.storage),
-      setKey: SettingBoxKey.enableDocProvider,
-      defaultVal: Pref.enableDocProvider,
-      onChanged: AndroidHelper.updateDocProvider,
-    ),
   SplitModel(
     normalModel: const NormalModel.split(
       title: '空降助手',
@@ -83,30 +75,10 @@ List<SettingsModel> get extraSettings => [
         .whenComplete(setState),
   ),
   const SwitchModel(
-    title: '禁用 SSL 证书验证',
-    subtitle: '谨慎开启，禁用容易受到中间人攻击',
-    leading: Icon(Icons.security),
-    needReboot: true,
-    setKey: SettingBoxKey.badCertificateCallback,
-  ),
-  const SwitchModel(
     title: '使用外部浏览器打开链接',
     leading: Icon(Icons.open_in_browser),
     setKey: SettingBoxKey.openInBrowser,
     defaultVal: false,
-  ),
-  NormalModel(
-    title: '横向滑动阈值',
-    getSubtitle: () => '当前:「${Pref.touchSlopH}」，系统默认值: $deviceTouchSlop',
-    onTap: _showTouchSlopDialog,
-    leading: const Icon(Icons.pan_tool_alt_outlined),
-  ),
-  NormalModel(
-    title: '刷新指示器高度',
-    leading: const Icon(Icons.height),
-    getSubtitle: () =>
-        '当前指示器高度: ${Pref.refreshDisplacement}, 刷新滑动距离: $refreshDragExtent',
-    onTap: _showRefreshDialog,
   ),
   const SwitchModel(
     title: '显示热门推荐',
@@ -227,25 +199,6 @@ List<SettingsModel> get extraSettings => [
     leading: Icon(Icons.beach_access_outlined),
     setKey: SettingBoxKey.disableLikeMsg,
     defaultVal: false,
-  ),
-  const SwitchModel(
-    title: '启用HTTP/2',
-    leading: Icon(Icons.swap_horizontal_circle_outlined),
-    setKey: SettingBoxKey.enableHttp2,
-    defaultVal: false,
-    needReboot: true,
-  ),
-  const NormalModel(
-    title: '连接重试次数',
-    subtitle: '为0时禁用',
-    leading: Icon(Icons.repeat),
-    onTap: _showReplyCountDialog,
-  ),
-  const NormalModel(
-    title: '连接重试间隔',
-    subtitle: '实际间隔 = 间隔 * 第x次重试',
-    leading: Icon(Icons.more_time_outlined),
-    onTap: _showReplyDelayDialog,
   ),
   const SplitModel(
     normalModel: NormalModel.split(
