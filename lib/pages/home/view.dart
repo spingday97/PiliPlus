@@ -85,7 +85,7 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
     return Column(
       children: [
         if (!_mainController.useSideBar && MediaQuery.isPortraitOf(context))
-          isModern ? _modernAppBar() : customAppBar(),
+          customAppBar(),
         tabBar,
         Expanded(
           child: onBuild(
@@ -98,10 +98,13 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
       ],
     );
   }
-  Widget _modernAppBar() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 10, 14, 4),
-      child: Row(
+  Widget customAppBar() {
+    final isModern = Pref.modernCardUi;
+    final padding = isModern
+        ? const EdgeInsets.fromLTRB(18, 8, 14, 0)
+        : const EdgeInsets.fromLTRB(14, 6, 14, 0);
+    final child = isModern
+        ? Row(
         children: [
           Text(
             '探索',
@@ -109,6 +112,7 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
               fontSize: 26,
               fontWeight: FontWeight.w800,
               letterSpacing: -0.5,
+              height: 1.1,
               color: _colorScheme.onSurface,
             ),
           ),
@@ -147,13 +151,8 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
             mainController: _mainController,
           ),
         ],
-      ),
-    );
-  }
-  
-  Widget customAppBar() {
-    const padding = EdgeInsets.fromLTRB(14, 6, 14, 0);
-    final child = Row(
+          )
+        : Row(
       children: [
         searchBar(),
         const SizedBox(width: 4),
