@@ -19,6 +19,7 @@ import 'package:PiliPlus/utils/extension/get_ext.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
+import 'package:flutter/rendering.dart' show ScrollDirection;
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart' hide DraggableScrollableSheet;
 
@@ -31,6 +32,7 @@ class DynamicsPage extends StatefulWidget {
 
 class _DynamicsPageState extends CommonPageState<DynamicsPage>
     with AutomaticKeepAliveClientMixin {
+  bool _showUpStrip = true;
   static const String _liveFirstLayoutKey = 'dynLiveFirstLayout';
 
   final _dynamicsController = Get.putOrFind(DynamicsController.new);
@@ -278,8 +280,8 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     Widget child = (isModern || _useLiveFirstLayout)
         ? Column(
             children: [
-              _buildLiveStrip(colorScheme),
-              Expanded(child: tabView),
+              AnimatedSize(duration: const Duration(milliseconds: 220), curve: Curves.easeOutCubic, child: _showUpStrip ? _buildLiveStrip(colorScheme) : const SizedBox(width: double.infinity, height: 0)),
+              Expanded(child: NotificationListener<UserScrollNotification>(onNotification: (notification) { if (notification.direction == ScrollDirection.reverse && _showUpStrip) { setState(() => _showUpStrip = false); } else if (notification.direction == ScrollDirection.forward && !_showUpStrip) { setState(() => _showUpStrip = true); } return false; }, child: tabView)),
             ],
           )
         : tabView;
