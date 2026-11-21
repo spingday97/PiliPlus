@@ -1,3 +1,4 @@
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/common/assets.dart';
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/style.dart';
@@ -115,7 +116,8 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
               child: TranslucentColumn(
                 crossAxisAlignment: .start,
                 children: [
-                  NoTranslucentArea(
+             if (Pref.modernCardUi && !isHorizontal) ...[Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(16)), child: NoTranslucentArea(child: _buildOwnerInfo(isLoading, isPortrait, isHorizontal, videoDetail))), const SizedBox(height: 10), Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(16)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [_buildTitle(isLoading, isHorizontal, videoDetail), const SizedBox(height: 8), Stack(clipBehavior: .none, children: [_buildInfo(videoDetail.stat, videoDetail.pubdate), if (introController.enableAiBtn) _aiBtn])]))] else ...[
+                 NoTranslucentArea(
                     child: _buildOwnerInfo(
                       isLoading,
                       isPortrait,
@@ -132,7 +134,8 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
                       _buildInfo(videoDetail.stat, videoDetail.pubdate),
                       if (introController.enableAi) _aiBtn,
                     ],
-                  ),
+                  ),],
+                    
                   if (introController.showArgueMsg)
                     if (videoDetail.argueInfo?.argueMsg case final argueMsg?
                         when argueMsg.isNotEmpty) ...[
@@ -175,7 +178,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
                   // 点赞收藏转发 布局样式2
                   if (!isHorizontal) ...[
                     const SizedBox(height: 8),
-                    actionGrid(
+                    if (Pref.modernCardUi) _modernBentoActionGrid(context, isLoading, introController, videoDetail.stat) else actionGrid(
                       context,
                       isLoading,
                       introController,
@@ -464,7 +467,8 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
         );
       },
     );
-  }
+  }  Widget _modernBentoActionGrid(BuildContext context, bool isLoading, UgcIntroController introController, VideoStat? stat) { final colorScheme = Theme.of(context).colorScheme; Widget tile({required IconData icon, required String label, required bool active, required Color bg, required Color fg, required VoidCallback onTap, VoidCallback? onLongPress}) { return Expanded(child: Material(color: active ? fg.withValues(alpha: 0.18) : bg, borderRadius: BorderRadius.circular(16), child: InkWell(borderRadius: BorderRadius.circular(16), onTap: onTap, onLongPress: onLongPress, child: SizedBox(height: 72, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 22, color: fg), const SizedBox(height: 4), Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 12, fontWeight: active ? FontWeight.w600 : FontWeight.w500, color: fg))]))))); } return Row(children: [Obx(() { final liked = introController.hasLike.value; return tile(icon: liked ? Icons.thumb_up : Icons.thumb_up_outlined, label: !isLoading && stat != null ? NumUtils.numFormat(stat.like) : '点赞', active: liked, bg: colorScheme.primaryContainer.withValues(alpha: 0.45), fg: colorScheme.primary, onTap: () => introController.handleAction(introController.actionLikeVideo)); }), const SizedBox(width: 8), Obx(() { final coined = introController.hasCoin; return tile(icon: coined ? Icons.monetization_on : Icons.monetization_on_outlined, label: !isLoading && stat != null ? NumUtils.numFormat(stat.coin) : '投币', active: coined, bg: colorScheme.secondaryContainer.withValues(alpha: 0.55), fg: colorScheme.secondary, onTap: introController.actionCoinVideo); }), const SizedBox(width: 8), Obx(() { final faved = introController.hasFav.value; return tile(icon: faved ? Icons.star : Icons.star_outline, label: !isLoading && stat != null ? NumUtils.numFormat(stat.favorite) : '收藏', active: faved, bg: colorScheme.tertiaryContainer.withValues(alpha: 0.55), fg: colorScheme.tertiary, onTap: () => introController.showFavBottomSheet(context), onLongPress: () => introController.showFavBottomSheet(context, isLongPress: true)); }), const SizedBox(width: 8), tile(icon: Icons.more_horiz, label: '更多', active: false, bg: colorScheme.surfaceContainerHighest.withValues(alpha: 0.7), fg: colorScheme.onSurfaceVariant, onTap: () => showModalBottomSheet(context: context, builder: (ctx) => SafeArea(child: Column(mainAxisSize: MainAxisSize.min, children: [ListTile(leading: const Icon(Icons.download_outlined), title: const Text('离线缓存'), onTap: () { Navigator.pop(ctx); videoDetailCtr.onDownload(context); }), ListTile(leading: const Icon(Icons.watch_later_outlined), title: const Text('稍后再看'), onTap: () { Navigator.pop(ctx); introController.handleAction(introController.viewLater); }), ListTile(leading: const Icon(Icons.share_outlined), title: const Text('分享'), onTap: () { Navigator.pop(ctx); introController.actionShareVideo(context); }), ListTile(leading: const Icon(Icons.thumb_down_outlined), title: const Text('点踩'), onTap: () { Navigator.pop(ctx); introController.handleAction(introController.actionDislikeVideo); })]))))]); }
+    
 
   Widget actionGrid(
     BuildContext context,
