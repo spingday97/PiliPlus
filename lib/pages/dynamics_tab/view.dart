@@ -16,10 +16,11 @@ import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
 
 class DynamicsTabPage extends StatefulWidget {
-  const DynamicsTabPage({super.key, required this.dynamicsType});
+  const DynamicsTabPage({super.key, required this.dynamicsType, this.upStripBuilder});
 
   final DynamicsTabType dynamicsType;
-
+  final WidgetBuilder? upStripBuilder;
+  
   @override
   State<DynamicsTabPage> createState() => _DynamicsTabPageState();
 }
@@ -56,6 +57,8 @@ class _DynamicsTabPageState extends State<DynamicsTabPage>
         physics: const AlwaysScrollableScrollPhysics(),
         controller: controller.scrollController,
         slivers: [
+     if (widget.upStripBuilder != null)
+        SliverToBoxAdapter(child: widget.upStripBuilder!(context)),
           SliverPadding(
             padding: const EdgeInsets.only(bottom: 100),
             sliver: buildPage(
