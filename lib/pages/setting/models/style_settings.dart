@@ -12,6 +12,7 @@ import 'package:PiliPlus/common/widgets/scale_app.dart';
 import 'package:PiliPlus/common/widgets/scroll_physics.dart'
     show kSpringDescription;
 import 'package:PiliPlus/common/widgets/stateful_builder.dart';
+import 'package:PiliPlus/models/common/enum_with_label.dart';
 import 'package:PiliPlus/models/common/bar_hide_type.dart';
 import 'package:PiliPlus/models/common/dynamic/dynamic_badge_mode.dart';
 import 'package:PiliPlus/models/common/dynamic/dynamics_type.dart';
@@ -428,6 +429,31 @@ List<SettingsModel> get styleSettings => [
     defaultVal: false,
     onChanged: (_) => Get.forceAppUpdate(),
   ),
+  PopupModel<_ColorPreset>(
+    title: '全局预设配色',
+    leading: const Icon(Icons.palette_outlined),
+    value: () => _ColorPreset.fromCode(Pref.colorPreset),
+    items: _ColorPreset.values,
+    onSelected: (value, setState) {
+      GStorage.setting.put(SettingBoxKey.colorPreset, value.code);
+      setState();
+      Get.forceAppUpdate();
+    },
+  ),
+  if (PlatformUtils.isAndroid)
+    PopupModel<_AppIconAlias>(
+      title: '桌面应用图标',
+      leading: const Icon(Icons.apps_outlined),
+      value: () => _AppIconAlias.fromAlias(Pref.appIconAlias),
+      items: _AppIconAlias.values,
+      onSelected: (value, setState) {
+        GStorage.setting.put(SettingBoxKey.appIconAlias, value.alias);
+        setState();
+        const MethodChannel('piliplus/install')
+            .invokeMethod('setAppIcon', {'alias': value.alias});
+        SmartDialog.showToast('已切换桌面图标，部分桌面需几秒刷新');
+      },
+    ),
   NormalModel(
     onTap: (context, setState) => Get.toNamed(
       '/barSetting',
@@ -456,6 +482,44 @@ List<SettingsModel> get styleSettings => [
       leading: const Icon(Icons.autofps_select_outlined),
     ),
 ];
+
+enum _ColorPreset implements EnumWithLabel {
+  followTheme(0, '默认跟随主题'),
+  morandiSlate(1, '莫兰迪灰蓝'),
+  warmCoral(2, '暖樱珊瑚'),
+  sageGreen(3, '鼠尾草青'),
+  amoledDark(4, 'AMOLED 暗夜');
+
+  final int code;
+  @override
+  final String label;
+
+  const _ColorPreset(this.code, this.label);
+
+  static _ColorPreset fromCode(int code) => values.firstWhere(
+        (e) => e.code == code,
+        orElse: () => followTheme,
+      );
+}
+
+enum _AppIconAlias implements EnumWithLabel {
+  launcherDefault('LauncherDefault', '默认原版图标'),
+  launcherSlate('LauncherSlate', '扁平灰蓝 P'),
+  launcherCoral('LauncherCoral', '扁平珊瑚小电视'),
+  launcherCeramic('LauncherCeramic', '扁平奶白双色 P'),
+  launcherOled('LauncherOled', '扁平曜石黑 P+');
+
+  final String alias;
+  @override
+  final String label;
+
+  const _AppIconAlias(this.alias, this.label);
+
+  static _AppIconAlias fromAlias(String alias) => values.firstWhere(
+        (e) => e.alias == alias,
+        orElse: () => launcherDefault,
+      );
+}
 
 void _showQualityDialog({
   required BuildContext context,
