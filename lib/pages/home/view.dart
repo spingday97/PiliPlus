@@ -82,6 +82,8 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
     } else {
       tabBar = const SizedBox(height: 6);
     }
+    if (Pref.modernCardUi && _homeController.hideTopBar) { final rawTabBar = tabBar; if (_mainController.barOffset case final barOffset?) { tabBar = Obx(() { final offset = barOffset.value.clamp(0.0, 46.0); return CustomHeightWidget(offset: Offset(0, -offset), height: (46.0 - offset).clamp(0.0, 46.0), child: rawTabBar); }); } else if (_homeController.showTopBar case final showTopBar?) { tabBar = Obx(() => AnimatedOpacity(opacity: showTopBar.value ? 1 : 0, duration: const Duration(milliseconds: 250), child: AnimatedContainer(duration: const Duration(milliseconds: 300), curve: Curves.easeInOutCubicEmphasized, height: showTopBar.value ? 46 : 0, child: rawTabBar))); } }
+    
     return Column(
       children: [
         if (!_mainController.useSideBar && MediaQuery.isPortraitOf(context))
@@ -161,6 +163,7 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
         userAvatar(colorScheme: _colorScheme, mainController: _mainController),
       ],
     );
+   if (Pref.modernCardUi) { return Container(height: Style.topBarHeight, padding: padding, child: child); }
     if (_homeController.hideTopBar) {
       if (_mainController.barOffset case final barOffset?) {
         return Obx(
