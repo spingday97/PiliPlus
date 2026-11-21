@@ -252,6 +252,8 @@ abstract final class SettingBoxKey {
       tabBarSort = 'tabBarSort',
       dynamicsTabSort = 'dynamicsTabSort',
       modernCardUi = 'modernCardUi',
+colorPreset = 'colorPreset',
+appIconAlias = 'appIconAlias',
       dynamicBadgeMode = 'dynamicBadgeMode',
       msgBadgeMode = 'msgBadgeMode',
       msgUnReadTypeV2 = 'msgUnReadTypeV2',
