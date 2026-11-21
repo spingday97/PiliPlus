@@ -197,7 +197,7 @@ class _HistoryPageState extends State<HistoryPage>
     );
   }
 
-  PreferredSizeWidget get _buildAppBar {
+  AppBar get _buildAppBar {
     final colorScheme = Theme.of(context).colorScheme;
     final isModern = Pref.modernCardUi;
     final menuBtn = PopupMenuButton(
@@ -236,20 +236,22 @@ class _HistoryPageState extends State<HistoryPage>
         ),
       ],
     );
-    if (isModern && widget.isTab) {
-        return PreferredSize(preferredSize: const Size.fromHeight(50), child: Padding(padding: const EdgeInsets.fromLTRB(18, 8, 14, 0), child: Row(children: [Text('历史', style: TextStyle(fontSize: 26, fontWeight: FontWeight.w800, letterSpacing: -0.5, height: 1.1, color: colorScheme.onSurface)), const Spacer(), Container(width: 38, height: 38, decoration: BoxDecoration(color: colorScheme.surface, shape: BoxShape.circle, border: Border.all(color: colorScheme.outline.withValues(alpha: 0.16), width: 0.8)), child: IconButton(padding: EdgeInsets.zero, tooltip: '搜索', onPressed: () => Get.toNamed('/historySearch'), icon: Icon(Icons.search, size: 20, color: colorScheme.onSurface))), const SizedBox(width: 6), menuBtn])));
-    }
     if (isModern) {
       return AppBar(
         automaticallyImplyLeading: !widget.isTab,
+        toolbarHeight: 50,
         titleSpacing: widget.isTab ? 18 : 0,
-        title: Text(
-          '历史',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.w800,
-            letterSpacing: -0.5,
-            color: colorScheme.onSurface,
+        title: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Text(
+            '历史',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+              height: 1.1,
+              color: colorScheme.onSurface,
+            ),
           ),
         ),
         actions: [
