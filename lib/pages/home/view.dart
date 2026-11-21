@@ -8,6 +8,7 @@ import 'package:PiliPlus/pages/main/controller.dart';
 import 'package:PiliPlus/pages/mine/controller.dart';
 import 'package:PiliPlus/utils/extension/get_ext.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:material_ui/material_ui.dart';
@@ -40,6 +41,7 @@ class _HomePageState extends CommonPageState<HomePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    final isModern = Pref.modernCardUi;
     Widget tabBar;
     if (_homeController.tabs.length > 1) {
       tabBar = Padding(
@@ -54,7 +56,13 @@ class _HomePageState extends CommonPageState<HomePage>
             dividerColor: Colors.transparent,
             dividerHeight: 0,
             splashBorderRadius: Style.mdRadius,
-            tabAlignment: TabAlignment.center,
+            tabAlignment:isModern ? TabAlignment.start :  TabAlignment.center,
+            padding: isModern ? const EdgeInsets.symmetric(horizontal: 14) : null,
+            indicatorSize: isModern ? TabBarIndicatorSize.tab : null,
+indicatorPadding: isModern ? const EdgeInsets.symmetric(vertical: 5) : EdgeInsets.zero,
+indicator: isModern ? BoxDecoration(color: _colorScheme.primary, borderRadius: BorderRadius.circular(18)) : null,
+labelColor: isModern ? _colorScheme.onPrimary : null,
+unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
             onTap: (_) {
               feedBack();
               if (!_homeController.tabController.indexIsChanging) {
@@ -77,7 +85,7 @@ class _HomePageState extends CommonPageState<HomePage>
     return Column(
       children: [
         if (!_mainController.useSideBar && MediaQuery.isPortraitOf(context))
-          customAppBar(),
+          isModern ? _modernAppBar() : customAppBar(),
         tabBar,
         Expanded(
           child: onBuild(
@@ -90,7 +98,59 @@ class _HomePageState extends CommonPageState<HomePage>
       ],
     );
   }
-
+  Widget _modernAppBar() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 10, 14, 4),
+      child: Row(
+        children: [
+          Text(
+            '探索',
+            style: TextStyle(
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+              letterSpacing: -0.5,
+              color: _colorScheme.onSurface,
+            ),
+          ),
+          const Spacer(),
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: _colorScheme.surface,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: _colorScheme.outline.withValues(alpha: 0.16),
+                width: 0.8,
+              ),
+            ),
+            child: IconButton(
+              padding: EdgeInsets.zero,
+              icon: Icon(
+                Icons.search,
+                size: 20,
+                color: _colorScheme.onSurface,
+              ),
+              onPressed: () => Get.toNamed(
+                '/search',
+                parameters: _homeController.enableSearchWord
+                    ? {'hintText': _homeController.defaultSearch.value}
+                    : null,
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
+          msgBadge(_mainController),
+          const SizedBox(width: 8),
+          userAvatar(
+            colorScheme: _colorScheme,
+            mainController: _mainController,
+          ),
+        ],
+      ),
+    );
+  }
+  
   Widget customAppBar() {
     const padding = EdgeInsets.fromLTRB(14, 6, 14, 0);
     final child = Row(
