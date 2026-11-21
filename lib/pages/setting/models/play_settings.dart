@@ -106,12 +106,6 @@ List<SettingsModel> get playSettings => [
     setKey: SettingBoxKey.enableSlideVolumeBrightness,
     defaultVal: true,
   ),
-  const SwitchModel(
-    title: '滚轮调节音量',
-    leading: Icon(Icons.mouse_outlined),
-    setKey: SettingBoxKey.enableScrollVolume,
-    defaultVal: true,
-  ),
   if (Platform.isAndroid)
     const SwitchModel(
       title: '调节系统亮度',
@@ -180,19 +174,6 @@ List<SettingsModel> get playSettings => [
     leading: const Icon(Icons.format_list_numbered_rtl_sharp),
     setKey: SettingBoxKey.horizontalSeasonPanel,
     defaultVal: Pref.horizontalScreen,
-  ),
-  SwitchModel(
-    title: '横屏播放页在侧栏打开UP主页',
-    leading: const Icon(Icons.account_circle_outlined),
-    setKey: SettingBoxKey.horizontalMemberPage,
-    defaultVal: Pref.horizontalScreen,
-  ),
-  SwitchModel(
-    title: '横屏在侧栏打开图片预览',
-    leading: const Icon(Icons.photo_outlined),
-    setKey: SettingBoxKey.horizontalPreview,
-    defaultVal: false,
-    onChanged: (value) => ImageGridView.horizontalPreview = value,
   ),
   const SwitchModel(
     title: '显示视频警告/争议信息',
@@ -270,12 +251,6 @@ List<SettingsModel> get playSettings => [
       defaultVal: false,
       onChanged: (value) => WindowController.instance.pauseOnMinimize = value,
     ),
-  const SwitchModel(
-    title: '启用键盘控制',
-    leading: Icon(Icons.keyboard_alt_outlined),
-    setKey: SettingBoxKey.keyboardControl,
-    defaultVal: true,
-  ),
   const SwitchModel(
     title: '自动佩戴直播间粉丝牌',
     leading: Icon(MdiIcons.medalOutline),
