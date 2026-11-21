@@ -89,25 +89,11 @@ List<SettingsModel> get videoSettings => [
     onTap: _showVideoQaDialog,
   ),
   NormalModel(
-    title: '蜂窝网络画质',
-    leading: const Icon(Icons.video_settings_outlined),
-    getSubtitle: () =>
-        '当前画质：${VideoQuality.fromCode(Pref.defaultVideoQaCellular).desc}',
-    onTap: _showVideoCellularQaDialog,
-  ),
-  NormalModel(
     title: '默认音质',
     leading: const Icon(Icons.music_video_outlined),
     getSubtitle: () =>
         '当前音质：${AudioQuality.fromCode(Pref.defaultAudioQa).desc}',
     onTap: _showAudioQaDialog,
-  ),
-  NormalModel(
-    title: '蜂窝网络音质',
-    leading: const Icon(Icons.music_video_outlined),
-    getSubtitle: () =>
-        '当前音质：${AudioQuality.fromCode(Pref.defaultAudioQaCellular).desc}',
-    onTap: _showAudioCellularQaDialog,
   ),
   NormalModel(
     title: '直播默认画质',
@@ -116,25 +102,11 @@ List<SettingsModel> get videoSettings => [
     onTap: _showLiveQaDialog,
   ),
   NormalModel(
-    title: '蜂窝网络直播默认画质',
-    leading: const Icon(Icons.video_settings_outlined),
-    getSubtitle: () =>
-        '当前画质：${LiveQuality.fromCode(Pref.liveQualityCellular).desc}',
-    onTap: _showLiveCellularQaDialog,
-  ),
-  NormalModel(
     title: '首选解码格式',
     leading: const Icon(Icons.movie_creation_outlined),
     getSubtitle: () =>
         '首选解码格式：${(Pref.preferCodecs.map((i) => i.name).join(","))}，请根据设备支持情况与需求调整',
     onTap: _showCodecsDialog,
-  ),
-  NormalModel(
-    title: '蜂窝网络首选解码格式',
-    leading: const Icon(Icons.movie_creation_outlined),
-    getSubtitle: () =>
-        '首选解码格式：${(Pref.preferCodecsCellular.map((i) => i.name).join(","))}，请根据设备支持情况与需求调整',
-    onTap: _showCellularCodecsDialog,
   ),
   if (kDebugMode || Platform.isAndroid)
     NormalModel(
@@ -156,38 +128,6 @@ List<SettingsModel> get videoSettings => [
     getSubtitle: () =>
         '当前：${Pref.bufferSec}s。点播视频的实际缓冲为大小与时长二者的最小值（此选项即mpv的--cache-secs）。直播流该选项无效，请设置下方的直播缓冲时长',
     onTap: _showBufferSecDialog,
-  ),
-  NormalModel(
-    title: '直播缓冲大小',
-    leading: const Icon(Icons.storage_outlined),
-    getSubtitle: () =>
-        '当前：${Pref.liveBufferSize > 0 ? '${Pref.liveBufferSize}MB' : '跟随缓冲大小（${(Pref.bufferSize * 2).toStringAsFixed(0)}MB）'}。仅对直播流生效，小于等于0时使用缓冲大小的2倍（此选项即mpv的--demuxer-max-bytes）',
-    onTap: _showLiveBufferSizeDialog,
-  ),
-  NormalModel(
-    title: '直播缓冲时长',
-    leading: const Icon(Icons.av_timer),
-    getSubtitle: () =>
-        '当前：${Pref.liveBufferSec > 0 ? '${Pref.liveBufferSec}s' : '不限制'}。仅对直播流生效，大于0时可限制直播缓冲时长以降低延迟（此选项即mpv的--cache-secs）',
-    onTap: _showLiveBufferSecDialog,
-  ),
-  NormalModel(
-    title: '自动同步',
-    leading: const Icon(Icons.sync_rounded),
-    getSubtitle: () => '当前：${Pref.autosync}（此项即mpv的--autosync）',
-    onTap: _showAutoSyncDialog,
-  ),
-  NormalModel(
-    title: '视频同步',
-    leading: const Icon(Icons.view_timeline_outlined),
-    getSubtitle: () => '当前：${Pref.videoSync}（此项即mpv的--video-sync）',
-    onTap: _showVideoSyncDialog,
-  ),
-  NormalModel(
-    title: '硬解模式',
-    leading: const Icon(Icons.memory_outlined),
-    getSubtitle: () => '当前：${Pref.hardwareDecoding}（此项即mpv的--hwdec）',
-    onTap: _showHwDecDialog,
   ),
 ];
 
