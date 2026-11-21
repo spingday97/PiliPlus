@@ -121,7 +121,7 @@ jobs:
               with:
                   tag_name: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || format('android-b{0}', github.run_number) }}
                   name: ${{ github.event.inputs.tag != '' && github.event.inputs.tag || format('android-b{0}', github.run_number) }}
-                  generate_release_notes: true
+                  body_path: release_notes.md
                   files: PiliPlus_android_*.apk
 
             - name: 上传
