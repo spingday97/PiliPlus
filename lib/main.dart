@@ -263,7 +263,7 @@ class MyApp extends StatelessWidget {
     final dynamicColor = _light != null && _dark != null && Pref.dynamicColor;
 
     final ColorScheme lightScheme, darkScheme;
-    if (Pref.colorPreset >= 1 && Pref.colorPreset <= 4) { final presetColor = switch (Pref.colorPreset) { 1 => const Color(0xFF5D738D), 2 => const Color(0xFFE06C75), 3 => const Color(0xFF4A7C6F), _ => const Color(0xFF7CC4FA) }; final variant = Pref.schemeVariant; lightScheme = presetColor.asColorSchemeSeed(variant, .light); darkScheme = presetColor.asColorSchemeSeed(variant, .dark); } else if (dynamicColor) {
+    if (Pref.colorPreset >= 1 && Pref.colorPreset <= 9) { final presetColor = switch (Pref.colorPreset) { 1 => const Color(0xFF5D738D), 2 => const Color(0xFFE06C75), 3 => const Color(0xFF4A7C6F), 4 => const Color(0xFF7CC4FA), 5 => const Color(0xFF7B6CF6), 6 => const Color(0xFFD97736), 7 => const Color(0xFF2B5B84), 8 => const Color(0xFFC86D7C), _ => const Color(0xFF7AA2F7) }; final variant = Pref.schemeVariant; lightScheme = presetColor.asColorSchemeSeed(variant, .light); darkScheme = presetColor.asColorSchemeSeed(variant, .dark); } else if (dynamicColor) {
       lightScheme = _light!;
       darkScheme = _dark!;
     } else {
@@ -288,7 +288,7 @@ class MyApp extends StatelessWidget {
     );
     if (Pref.modernCardUi || Pref.colorPreset > 0) {
       light = light.copyWith(
-        scaffoldBackgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), _ => const Color(0xFFF3F5F8) },
+        scaffoldBackgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), 5 => const Color(0xFFF6F5FC), 6 => const Color(0xFFFAF7F2), 7 => const Color(0xFFF4F7FA), 8 => const Color(0xFFFAF5F6), _ => const Color(0xFFF3F5F8) },
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 0,
@@ -299,9 +299,9 @@ class MyApp extends StatelessWidget {
         ),
       );
       dark = dark.copyWith(
-        scaffoldBackgroundColor: Pref.colorPreset == 4 ? Colors.black : darkScheme.surfaceContainerLowest,
+        scaffoldBackgroundColor: switch (Pref.colorPreset) { 4 => Colors.black, 9 => const Color(0xFF12151C), _ => darkScheme.surfaceContainerLowest },
         cardTheme: CardThemeData(
-          color: Pref.colorPreset == 4 ? const Color(0xFF161920) : darkScheme.surfaceContainer,
+          color: switch (Pref.colorPreset) { 4 => const Color(0xFF161920), 9 => const Color(0xFF1C212B), _ => darkScheme.surfaceContainer },
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
