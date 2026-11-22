@@ -347,7 +347,6 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [Locale("zh", "CN"), Locale("en", "US")],
       initialRoute: '/',
       getPages: Routes.getPages,
-      transitionDuration: Duration(milliseconds: (260 * _animatorScale).round().clamp(0, 600)),
       defaultTransition: Pref.modernCardUi && Pref.pageTransition == Transition.native ? Transition.cupertino : Pref.pageTransition,
       builder: FlutterSmartDialog.init(
         toastBuilder: CustomToast.new,
