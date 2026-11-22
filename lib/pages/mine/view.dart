@@ -161,7 +161,7 @@ class _MediaPageState extends CommonPageState<MinePage>
                   padding: const .only(bottom: 150),
                   physics: const AlwaysScrollableScrollPhysics(),
                   children: [
-                    (
+                    _buildTopBannerAndUser(
                       theme,
                       secondary,
                       topPadding,
