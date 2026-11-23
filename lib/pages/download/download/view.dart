@@ -9,6 +9,7 @@ import 'package:PiliPlus/models_new/download/download_info.dart';
 import 'package:PiliPlus/pages/common/multi_select/base.dart';
 import 'package:PiliPlus/pages/download/detail/widgets/item.dart';
 import 'package:PiliPlus/pages/download/download/controller.dart';
+import 'package:PiliPlus/pages/download/download/widgets/audio_tab.dart';
 import 'package:PiliPlus/pages/download/download/widgets/page.dart';
 import 'package:PiliPlus/pages/download/download/widgets/season.dart';
 import 'package:PiliPlus/pages/download/download_action_mixin.dart';
@@ -31,10 +32,10 @@ class DownloadPage extends StatefulWidget {
 }
 
 class _DownloadPageState extends State<DownloadPage>
-    with GridMixin, BaseDownloadActionMixin<DownloadPage, DownloadSeasonInfo> {
+    with TickerProviderStateMixin, GridMixin, BaseDownloadActionMixin<DownloadPage, DownloadSeasonInfo> {
   final _progress = ChangeNotifier();
   final _controller = Get.put(DownloadController());
-
+  late final TabController _tabController = TabController(length: 2, vsync: this);
   @override
   final downloadService = Get.find<DownloadService>();
 
@@ -44,7 +45,8 @@ class _DownloadPageState extends State<DownloadPage>
   @override
   void dispose() {
     _progress.dispose();
-    super.dispose();
+    _tabController.dispose();
+super.dispose();
   }
 
   @override
@@ -175,7 +177,8 @@ class _DownloadPageState extends State<DownloadPage>
             ctr: _controller,
             actions: [updateBtn()],
             child: AppBar(
-              title: const Text('离线缓存'),
+              title: const Text('我的下载'),
+              bottom: TabBar(controller: _tabController, tabs: const [Tab(text: '视频'), Tab(text: '音频')]),
               actions: [
                 IconButton(
                   tooltip: '搜索',
@@ -201,7 +204,10 @@ class _DownloadPageState extends State<DownloadPage>
               ],
             ),
           ),
-          body: Padding(
+          body: TabBarView(
+controller: _tabController,
+children: [
+Padding(
             padding: EdgeInsets.only(left: padding.left, right: padding.right),
             child: CustomScrollView(
               slivers: [
@@ -333,6 +339,9 @@ class _DownloadPageState extends State<DownloadPage>
             ),
           ),
         ),
+const DownloadedAudioTab(),
+],
+),
       );
     });
   }
