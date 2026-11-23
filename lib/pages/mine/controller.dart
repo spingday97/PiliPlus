@@ -51,7 +51,7 @@ class MineController extends GetxController with AccountMixin {
   late final list = <({IconData icon, String title, VoidCallback onTap})>[
     (
       icon: CustomIcons.folderDownloadOutline,
-      title: '离线缓存',
+      title: '我的下载',
       onTap: () => Get.toNamed('/download'),
     ),
     (
