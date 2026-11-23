@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:material_ui/material_ui.dart';
 
 const double _kMaxLabelTextScaleFactor = 1.3;
@@ -78,8 +79,8 @@ class FloatingNavigationBar extends StatelessWidget {
     final itemWidth = innerWidth / destinations.length;
     final effectiveIndicatorColor =
         indicatorColor ??
-        navigationBarTheme.indicatorColor ??
-        defaults.indicatorColor!;
+        (Pref.modernCardUi ? colors.primary.withValues(alpha: 0.12) : navigationBarTheme.indicatorColor ??
+        defaults.indicatorColor)!;
 
     final baseBg = ElevationOverlay.applySurfaceTint(
       backgroundColor ??
@@ -103,7 +104,7 @@ class FloatingNavigationBar extends StatelessWidget {
         width: totalWidth,
         child: DecoratedBox(
           decoration: ShapeDecoration(
-            color: baseBg.withValues(alpha: 0.94),
+            color: Pref.modernCardUi ? (colors.isDark ? const Color(0xFF1C1C1E).withValues(alpha: 0.90) : Colors.white.withValues(alpha: 0.90)) : baseBg.withValues(alpha: 0.94),
             shadows: [
               BoxShadow(
                 color: colors.isDark
@@ -114,7 +115,7 @@ class FloatingNavigationBar extends StatelessWidget {
               ),
             ],
             shape: RoundedSuperellipseBorder(
-              side: defaults.borderSide,
+              side: Pref.modernCardUi ? BorderSide(color: colors.isDark ? Colors.white.withValues(alpha: 0.14) : Colors.black.withValues(alpha: 0.08), width: 0.6) : defaults.borderSide,
               borderRadius: _kBorderRadius,
             ),
           ),
