@@ -52,7 +52,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:material_ui/material_ui.dart' hide StatefulBuilder;
 import 'package:path/path.dart' as path;
 
-List<SettingsModel> get styleSettings => [
+List<SettingsModel> get styleSettings => _prioritizeStyle(_[
   if (PlatformUtils.isDesktop) ...[
     const SwitchModel(
       title: '显示窗口标题栏',
@@ -450,8 +450,20 @@ List<SettingsModel> get styleSettings => [
       title: '屏幕帧率',
       leading: const Icon(Icons.autofps_select_outlined),
     ),
-];
-
+]);
+List<SettingsModel> _prioritizeStyle(List<SettingsModel> list) {
+    const order = ['现代轻卡片界面', '全局预设配色', '主题模式', '纯黑主题', '应用主题', '桌面应用图标', '屏幕帧率', 'App字体设置', '悬浮底栏', 'MD3样式底栏', 'Navbar编辑', '我的页卡片', '默认启动页', '页面过渡动画'];
+    final orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
+final prioritized = List.generate(order.length, (_) => <SettingsModel>[]);
+final rest = <SettingsModel>[];
+for (final item in list) {
+final title = item.title ?? item.getTitle?.call() ?? '';
+final idx = orderMap[title];
+if (idx != null) { prioritized[idx].add(item); } else { rest.add(item); }
+}
+return [for (final bucket in prioritized) ...bucket, ...rest];
+}
+    
 enum _ColorPreset implements EnumWithLabel {
   followTheme(0, '默认跟随主题'),
   morandiSlate(1, '莫兰迪灰蓝'),
