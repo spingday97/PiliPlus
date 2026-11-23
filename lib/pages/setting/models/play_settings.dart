@@ -28,7 +28,7 @@ import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:material_ui/material_ui.dart';
 
-List<SettingsModel> get playSettings => [
+List<SettingsModel> get playSettings => _prioritizePlay([
   NormalModel(
     onTap: (context, setState) => Get.toNamed('/playSpeedSet'),
     leading: const Icon(Icons.speed_outlined),
@@ -407,7 +407,19 @@ List<SettingsModel> get playSettings => [
     setKey: SettingBoxKey.tempPlayerConf,
     defaultVal: false,
   ),
-];
+]);
+List<SettingsModel> _prioritizePlay(List<SettingsModel> list) {
+const order = ['倍速设置', '自动播放', '后台播放', '后台音频服务', '允许与其他应用同时播放', '后台画中画', '画中画不加载弹幕', '双击快退/快进', '左右侧滑动调节亮度/音量', '中间滑动进入/退出全屏', '默认全屏方向', '底部进度条展示'];
+final orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
+final prioritized = List.generate(order.length, (_) => <SettingsModel>[]);
+final rest = <SettingsModel>[];
+for (final item in list) {
+final title = item.title ?? item.getTitle?.call() ?? '';
+final idx = orderMap[title];
+if (idx != null) { prioritized[idx].add(item); } else { rest.add(item); }
+}
+return [for (final bucket in prioritized) ...bucket, ...rest];
+}
 
 Future<void> _showSubtitleDialog(
   BuildContext context,
