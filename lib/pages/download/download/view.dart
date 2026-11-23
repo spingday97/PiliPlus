@@ -164,6 +164,7 @@ super.dispose();
   Widget build(BuildContext context) {
     final padding = MediaQuery.viewPaddingOf(context);
     return Obx(() {
+    final theme = Theme.of(context);
       final enableMultiSelect = _controller.enableMultiSelect.value;
       return popScope(
         canPop: !enableMultiSelect,
@@ -178,7 +179,7 @@ super.dispose();
             actions: [updateBtn()],
             child: AppBar(
               title: const Text('我的下载'),
-              bottom: TabBar(controller: _tabController, tabs: const [Tab(text: '视频'), Tab(text: '音频')]),
+              bottom: PreferredSize(preferredSize: const Size.fromHeight(44), child: Padding(padding: const EdgeInsets.fromLTRB(16, 0, 16, 8), child: Container(height: 36, padding: const EdgeInsets.all(3), decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.7), borderRadius: BorderRadius.circular(10)), child: TabBar(controller: _tabController, dividerColor: Colors.transparent, indicatorSize: TabBarIndicatorSize.tab, indicator: BoxDecoration(color: theme.cardTheme.color ?? theme.colorScheme.surface, borderRadius: BorderRadius.circular(8), boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 4, offset: Offset(0, 1))]), labelStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w600), unselectedLabelStyle: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w500), tabs: const [Tab(text: '视频'), Tab(text: '音频')])))),
               actions: [
                 IconButton(
                   tooltip: '搜索',
