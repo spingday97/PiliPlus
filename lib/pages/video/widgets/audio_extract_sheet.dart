@@ -9,7 +9,7 @@ import 'package:PiliPlus/models/video/play/url.dart';
 import 'package:PiliPlus/pages/video/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/controller.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/controller.dart';
-import 'package:PiliPlus/utils/storage_utils.dart';
+import 'package:PiliPlus/utils/audio_extract_storage.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -62,9 +62,16 @@ class _AudioExtractSheetState extends State<AudioExtractSheet> {
   }
 
   void _loadFromController() {
-    final dash = widget.videoDetailCtr.data.dash;
-    _durationSec = dash?.duration;
-    _audioList = _sortAudio(dash?.audio ?? const []);
+    try {
+      final dash = widget.videoDetailCtr.data.dash;
+      _durationSec = dash?.duration;
+      _audioList = _sortAudio(dash?.audio ?? const []);
+    } catch (_) {
+      _audioList = const [];
+    }
+    if (_audioList.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _refreshStreams());
+    }
   }
 
   List<AudioItem> _sortAudio(List<AudioItem> list) {
@@ -236,10 +243,16 @@ class _AudioExtractSheetState extends State<AudioExtractSheet> {
       return;
     }
 
-    await StorageUtils.saveBytes2File(
-      name: fileName,
+    await AudioExtractStorage.saveAudio(
+      fileName: fileName,
       bytes: Uint8List.fromList(downloadedBytes),
+      title: rawTitle,
+      quality: qualityDesc,
+      codecs: item.codecs,
+      bandWidth: item.bandWidth,
+      url: urls.first,
     );
+    SmartDialog.showToast('已保存到「我的下载 -> 音频」');
   }
 
   @override
