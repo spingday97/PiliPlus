@@ -341,7 +341,7 @@ Padding(
 const DownloadedAudioTab(),
 ],
 ),
-      );
+      ));
     });
   }
 }
