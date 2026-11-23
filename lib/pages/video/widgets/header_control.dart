@@ -3,6 +3,7 @@ import 'dart:convert' show utf8;
 import 'dart:io' show Platform;
 import 'dart:typed_data' show Uint8List;
 
+import 'package:PiliPlus/pages/video/widgets/audio_extract_sheet.dart';
 import 'package:PiliPlus/common/widgets/button/icon_button.dart';
 import 'package:PiliPlus/common/widgets/custom_icon.dart';
 import 'package:PiliPlus/common/widgets/dialog/report.dart';
@@ -405,7 +406,20 @@ class HeaderControlState extends State<HeaderControl>
                     ),
                     title: const Text('离线缓存', style: titleStyle),
                   ),
-                if (widget.videoDetailCtr.cover.value.isNotEmpty)
+        if (!isFileSource)
+          ListTile(
+            dense: true,
+            onTap: () {
+              Get.back();
+              AudioExtractSheet.show(this.context, videoDetailCtr);
+            },
+            leading: const Icon(
+              Icons.audiotrack_rounded,
+              size: 20,
+            ),
+            title: const Text('提取独立音频', style: titleStyle),
+          ),
+                  if (widget.videoDetailCtr.cover.value.isNotEmpty)
                   ListTile(
                     dense: true,
                     onTap: () {
