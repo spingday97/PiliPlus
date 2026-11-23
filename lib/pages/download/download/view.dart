@@ -338,7 +338,6 @@ Padding(
               ],
             ),
           ),
-        ),
 const DownloadedAudioTab(),
 ],
 ),
