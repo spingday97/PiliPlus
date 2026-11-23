@@ -404,14 +404,19 @@ class HeaderControlState extends State<HeaderControl>
                       MdiIcons.folderDownloadOutline,
                       size: 20,
                     ),
-                    title: const Text('离线缓存', style: titleStyle),
+                    title: const Text('缓存视频', style: titleStyle),
                   ),
         if (!isFileSource)
           ListTile(
             dense: true,
             onTap: () {
               Get.back();
-              AudioExtractSheet.show(this.context, videoDetailCtr);
+              Future.delayed(const Duration(milliseconds: 80), () {
+                  final ctx = Get.context;
+                  if (ctx != null && ctx.mounted) {
+                      AudioExtractSheet.show(ctx, videoDetailCtr);
+                  }
+                  });
             },
             leading: const Icon(
               Icons.audiotrack_rounded,
