@@ -302,29 +302,33 @@ class MyApp extends StatelessWidget {
     );
     if (Pref.modernCardUi || Pref.colorPreset > 0) {
       light = light.copyWith(
-        scaffoldBackgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), 5 => const Color(0xFFF6F5FC), 6 => const Color(0xFFFAF7F2), 7 => const Color(0xFFF4F7FA), 8 => const Color(0xFFFAF5F6), _ => const Color(0xFFF3F5F8) },
+        scaffoldBackgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), 5 => const Color(0xFFF6F5FC), 6 => const Color(0xFFFAF7F2), 7 => const Color(0xFFF4F7FA), 8 => const Color(0xFFFAF5F6), _ => const Color(0xFFF2F2F7) },
         cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: const BorderSide(color: Color(0x14000000), width: 0.8),
+            borderRadius: BorderRadius.circular(14),
+            side: const BorderSide(color: Color(0x14000000), width: 0.5),
           ),
-        ),
+        ), 
+        appBarTheme: light.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), 5 => const Color(0xFFF6F5FC), 6 => const Color(0xFFFAF7F2), 7 => const Color(0xFFF4F7FA), 8 => const Color(0xFFFAF5F6), _ => const Color(0xFFF2F2F7) }),
+        dividerTheme: const DividerThemeData(color: Color(0x1A000000), thickness: 0.5, space: 0.5),
       );
       dark = dark.copyWith(
-        scaffoldBackgroundColor: switch (Pref.colorPreset) { 4 => Colors.black, 9 => const Color(0xFF12151C), _ => darkScheme.surfaceContainerLowest },
+        scaffoldBackgroundColor: switch (Pref.colorPreset) { 4 => Colors.black, 9 => const Color(0xFF12151C), _ => const Color(0xFF000000) },
         cardTheme: CardThemeData(
-          color: switch (Pref.colorPreset) { 4 => const Color(0xFF161920), 9 => const Color(0xFF1C212B), _ => darkScheme.surfaceContainer },
+          color: switch (Pref.colorPreset) { 4 => const Color(0xFF161920), 9 => const Color(0xFF1C212B), _ => const Color(0xFF1C1C1E) },
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-            side: BorderSide(
-              color: darkScheme.outline.withValues(alpha: 0.14),
-              width: 0.8,
+            borderRadius: BorderRadius.circular(14),
+            side: const BorderSide(
+              color: Color(0x1FFFFFFF),
+              width: 0.5,
             ),
           ),
-        ),
+        ), 
+        appBarTheme: dark.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: switch (Pref.colorPreset) { 4 => Colors.black, 9 => const Color(0xFF12151C), _ => const Color(0xFF000000) }),
+        dividerTheme: const DividerThemeData(color: Color(0x1FFFFFFF), thickness: 0.5, space: 0.5),
       );
     }
     return (
