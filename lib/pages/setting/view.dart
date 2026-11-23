@@ -44,14 +44,9 @@ class _SettingPageState extends State<SettingPage> {
 
   static const List<_SettingsModel> _items = [
     _SettingsModel(
-      type: .privacySetting,
-      subtitle: '账号、黑名单',
-      icon: Icon(Icons.privacy_tip_outlined),
-    ),
-    _SettingsModel(
-      type: .recommendSetting,
-      subtitle: '推荐来源（web/app）、刷新保留内容、过滤器',
-      icon: Icon(Icons.explore_outlined),
+      type: .styleSetting,
+      subtitle: '横屏适配（平板）、侧栏、列宽、首页、动态红点、主题、字号、图片、帧率等',
+      icon: Icon(Icons.style_outlined),
     ),
     _SettingsModel(
       type: .videoSetting,
@@ -69,6 +64,11 @@ class _SettingPageState extends State<SettingPage> {
       icon: Icon(CustomIcons.dm_settings),
     ),
     _SettingsModel(
+      type: .recommendSetting,
+      subtitle: '推荐来源（web/app）、刷新保留内容、过滤器',
+      icon: Icon(Icons.explore_outlined),
+    ),
+    _SettingsModel(
       type: .replySetting,
       subtitle: '过滤、屏蔽、记录、默认展示等',
       icon: Icon(Icons.comment_outlined),
@@ -79,9 +79,9 @@ class _SettingPageState extends State<SettingPage> {
       icon: Icon(CustomIcons.motion_photos_on_outlined),
     ),
     _SettingsModel(
-      type: .styleSetting,
-      subtitle: '横屏适配（平板）、侧栏、列宽、首页、动态红点、主题、字号、图片、帧率等',
-      icon: Icon(Icons.style_outlined),
+      type: .privacySetting,
+      subtitle: '账号、黑名单',
+      icon: Icon(Icons.privacy_tip_outlined),
     ),
     _SettingsModel(
       type: .extraSetting,
