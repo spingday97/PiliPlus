@@ -17,7 +17,7 @@ class DownloadedAudioTab extends StatefulWidget {
 
 class _DownloadedAudioTabState extends State<DownloadedAudioTab>
     with AutomaticKeepAliveClientMixin {
-  final Player _player = Player();
+  Player? _player;
   StreamSubscription<bool>? _playingSub;
   StreamSubscription<bool>? _completedSub;
 
@@ -33,13 +33,7 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
   void initState() {
     super.initState();
     AudioExtractStorage.version.addListener(_load);
-    _playingSub = _player.stream.playing.listen((playing) {
-      if (mounted) setState(() => _isPlaying = playing);
-    });
-    _completedSub = _player.stream.completed.listen((done) {
-      if (done && mounted) setState(() => _isPlaying = false);
-    });
-    _load();
+     _load();
   }
 
   @override
@@ -47,10 +41,22 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
     AudioExtractStorage.version.removeListener(_load);
     _playingSub?.cancel();
     _completedSub?.cancel();
-    _player.dispose();
+    _player?.dispose();
     super.dispose();
   }
-
+  Future<Player> _ensurePlayer() async {
+    if (_player != null) return _player!;
+    final p = await Player.create();
+    _playingSub = p.stream.playing.listen((playing) {
+      if (mounted) setState(() => _isPlaying = playing);
+      });
+    _completedSub = p.stream.completed.listen((done) {
+      if (done && mounted) setState(() => _isPlaying = false);
+      });
+    _player = p;
+    return p;
+  }
+  
   Future<void> _load() async {
     final list = await AudioExtractStorage.listAll();
     if (mounted) {
@@ -70,11 +76,12 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
   }
 
   Future<void> _togglePlay(ExtractedAudioItem item) async {
+    final player = await _ensurePlayer();
     if (_playingPath == item.filePath) {
-      await _player.playOrPause();
+      await player.playOrPause();
     } else {
       setState(() => _playingPath = item.filePath);
-      await _player.open(Media(item.filePath));
+      await player.open(Media(item.filePath));
     }
   }
 
@@ -89,7 +96,7 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
 
   Future<void> _deleteItem(ExtractedAudioItem item) async {
     if (_playingPath == item.filePath) {
-      await _player.stop();
+      await _player?.stop();
       _playingPath = null;
     }
     await AudioExtractStorage.deleteItem(item);
