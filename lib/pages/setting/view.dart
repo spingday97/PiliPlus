@@ -300,7 +300,7 @@ class _SettingPageState extends State<SettingPage> {
     TextStyle subTitleStyle,
   ) {
     _SettingsModel itemOf(SettingType type) =>
-        _items.firstWhere((e) => e.type == type);
+        _items.firstWhere((e) => e.type == type); Color _badgeColor(SettingType type) => switch (type) { SettingType.styleSetting => const Color(0xFFFF2D55), SettingType.videoSetting => const Color(0xFF007AFF), SettingType.playSetting => const Color(0xFFAF52DE), SettingType.dmSetting => const Color(0xFFFF9500), SettingType.recommendSetting => const Color(0xFF34C759), SettingType.replySetting => const Color(0xFF30B0C7), SettingType.dynSetting => const Color(0xFF5856D6), SettingType.privacySetting => const Color(0xFFFF3B30), SettingType.extraSetting => const Color(0xFFFFCC00), SettingType.about => const Color(0xFF8E8E93) };
 
     Widget buildTile({
       required Widget icon,
@@ -316,20 +316,20 @@ class _SettingPageState extends State<SettingPage> {
         tileColor: selected ? theme.colorScheme.onInverseSurface : null,
         onTap: onTap,
         leading: Container(
-          width: 36,
-          height: 36,
+          width: 28,
+          height: 28,
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            borderRadius: BorderRadius.circular(10),
+            color: color,
+            borderRadius: BorderRadius.circular(7),
           ),
           child: IconTheme(
-            data: IconThemeData(color: color, size: 20),
+            data: const IconThemeData(color: Colors.white, size: 17),
             child: icon,
           ),
         ),
         title: Text(title, style: titleStyle),
         subtitle: subtitle == null ? null : Text(subtitle, style: subTitleStyle),
-        trailing: const Icon(Icons.chevron_right, size: 18),
+        trailing: Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.outline.withValues(alpha: 0.55)),
       );
     }
 
@@ -338,7 +338,7 @@ class _SettingPageState extends State<SettingPage> {
       return buildTile(
         icon: item.icon,
         title: title,
-        subtitle: item.subtitle,
+        subtitle: item.subtitle, iconColor: _badgeColor(item.type),
         selected: !_isPortrait && _type == type,
         onTap: () => _toPage(type),
       );
@@ -362,15 +362,15 @@ class _SettingPageState extends State<SettingPage> {
             ),
             Container(
               decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(16),
+                color: theme.cardTheme.color ?? theme.colorScheme.surface,
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: theme.colorScheme.outline.withValues(alpha: 0.12),
-                  width: 0.7,
+                  color: theme.dividerColor,
+                  width: 0.5,
                 ),
               ),
               clipBehavior: Clip.antiAlias,
-              child: Column(children: children),
+              child: Column(children: [for (int i = 0; i < children.length; i++) ...[if (i > 0) Divider(height: 0.5, thickness: 0.5, color: theme.dividerColor), children[i]]]),
             ),
           ],
         ),
