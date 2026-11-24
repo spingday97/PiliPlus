@@ -300,7 +300,7 @@ class MyApp extends StatelessWidget {
       colorScheme: darkScheme,
       isDynamic: dynamicColor,
     );
-    if (Pref.modernCardUi || Pref.colorPreset > 0) {
+    if (Pref.iosStyleUi) {
       light = light.copyWith(
         scaffoldBackgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), 5 => const Color(0xFFF6F5FC), 6 => const Color(0xFFFAF7F2), 7 => const Color(0xFFF4F7FA), 8 => const Color(0xFFFAF5F6), _ => const Color(0xFFF2F2F7) },
         cardTheme: CardThemeData(
@@ -330,6 +330,32 @@ class MyApp extends StatelessWidget {
         appBarTheme: dark.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: switch (Pref.colorPreset) { 4 => Colors.black, 9 => const Color(0xFF12151C), _ => const Color(0xFF000000) }),
         dividerTheme: const DividerThemeData(color: Color(0x1FFFFFFF), thickness: 0.5, space: 0.5),
       );
+    } else if (Pref.modernCardUi || Pref.colorPreset > 0) {
+      light = light.copyWith(
+        scaffoldBackgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), 5 => const Color(0xFFF6F5FC), 6 => const Color(0xFFFAF7F2), 7 => const Color(0xFFF4F7FA), 8 => const Color(0xFFFAF5F6), 0 => const Color(0xFFF6F7FA), _ => const Color(0xFFF6F7FA) },
+        cardTheme: CardThemeData(
+          color: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: Color(0x14000000), width: 0.8),
+          ),
+        ),
+      );
+      dark = dark.copyWith(
+        scaffoldBackgroundColor: switch (Pref.colorPreset) { 4 => Colors.black, 9 => const Color(0xFF12151C), _ => const Color(0xFF121318) },
+        cardTheme: CardThemeData(
+          color: switch (Pref.colorPreset) { 4 => const Color(0xFF161920), 9 => const Color(0xFF1C212B), _ => const Color(0xFF1E1F25) },
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(
+              color: Color(0x1FFFFFFF),
+              width: 0.8,
+            ),
+          ),
+        ),
+      );
     }
     return (
       ThemeUtils.lightTheme = light,
@@ -351,7 +377,7 @@ class MyApp extends StatelessWidget {
       supportedLocales: const [Locale("zh", "CN"), Locale("en", "US")],
       initialRoute: '/',
       getPages: Routes.getPages,
-      defaultTransition: Pref.modernCardUi && Pref.pageTransition == Transition.native ? Transition.cupertino : Pref.pageTransition,
+      defaultTransition: (Pref.iosStyleUi || Pref.modernCardUi) && Pref.pageTransition == Transition.native ? Transition.cupertino : Pref.pageTransition,
       builder: FlutterSmartDialog.init(
         toastBuilder: CustomToast.new,
         loadingBuilder: LoadingWidget.new,
