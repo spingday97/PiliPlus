@@ -24,7 +24,12 @@ class AudioExtractSheet extends StatefulWidget {
 
   final VideoDetailController videoDetailCtr;
 
-  static void show(BuildContext context, VideoDetailController videoDetailCtr) {
+  static Future<void> show(
+  BuildContext context,
+  VideoDetailController videoDetailCtr,
+  ) async {
+    await Future.delayed(const Duration(milliseconds: 50));
+    if (!context.mounted) return;
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
