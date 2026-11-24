@@ -680,7 +680,7 @@ abstract final class Pref {
      _setting.get(SettingBoxKey.allowPlayWithOthers, defaultValue: false);
 
   static bool get modernCardUi =>
-      _setting.get(SettingBoxKey.modernCardUi, defaultValue: false);
+      _setting.get(SettingBoxKey.modernCardUi, defaultValue: false); static bool get iosStyleUi => _setting.get(SettingBoxKey.iosStyleUi, defaultValue: false);
 
 static int get colorPreset =>
 _setting.get(SettingBoxKey.colorPreset, defaultValue: 0);
