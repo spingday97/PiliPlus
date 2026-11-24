@@ -93,7 +93,7 @@ class FloatingNavigationBar extends StatelessWidget {
       elevation ?? navigationBarTheme.elevation ?? defaults.elevation!,
     );
 
-    return Padding(
+    final isModern = Pref.modernCardUi && !Pref.iosStyleUi; final navHeight = isModern ? 52.0 : _kNavigationHeight; return Padding(
       padding: .fromLTRB(
         padding.left,
         0,
@@ -101,11 +101,11 @@ class FloatingNavigationBar extends StatelessWidget {
         bottomPadding + padding.bottom,
       ),
       child: SizedBox(
-        height: _kNavigationHeight,
+        height: (Pref.modernCardUi && !Pref.iosStyleUi) ? 52.0 : _kNavigationHeight,
         width: totalWidth,
         child: DecoratedBox(
           decoration: Pref.iosStyleUi ? NeuStyle.raised(isDark: colors.isDark, radius: _kNavigationHeight / 2, blur: 14, offset: 5) : ShapeDecoration(
-            color: Pref.iosStyleUi ? (colors.isDark ? const Color(0xFF1C1C1E).withValues(alpha: 0.90) : Colors.white.withValues(alpha: 0.90)) : baseBg.withValues(alpha: 0.94),
+            color: Pref.iosStyleUi ? (colors.isDark ? const Color(0xFF1C1C1E).withValues(alpha: 0.90) : Colors.white.withValues(alpha: 0.90)) : (Pref.modernCardUi && !Pref.iosStyleUi) ? (colors.isDark ? const Color(0xFF1C1C1E) : Colors.white) : baseBg.withValues(alpha: 0.94),
             shadows: [
               BoxShadow(
                 color: colors.isDark
@@ -116,7 +116,7 @@ class FloatingNavigationBar extends StatelessWidget {
               ),
             ],
             shape: RoundedSuperellipseBorder(
-              side: Pref.iosStyleUi ? BorderSide(color: colors.isDark ? Colors.white.withValues(alpha: 0.14) : Colors.black.withValues(alpha: 0.08), width: 0.6) : defaults.borderSide,
+              side: Pref.iosStyleUi ? BorderSide(color: colors.isDark ? Colors.white.withValues(alpha: 0.14) : Colors.black.withValues(alpha: 0.08), width: 0.6) : (Pref.modernCardUi && !Pref.iosStyleUi) ? BorderSide(color: colors.isDark ? Colors.white.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.08), width: 0.8) : defaults.borderSide,
               borderRadius: _kBorderRadius,
             ),
           ),
@@ -132,7 +132,7 @@ class FloatingNavigationBar extends StatelessWidget {
                   bottom: 0,
                   width: itemWidth,
                   child: DecoratedBox(
-                    decoration: Pref.iosStyleUi ? NeuStyle.inset(isDark: colors.isDark, radius: _kIndicatorHeight / 2) : ShapeDecoration(shape: indicatorShape ?? _kNavigationShape, color: effectiveIndicatorColor),
+                    decoration: Pref.iosStyleUi ? NeuStyle.inset(isDark: colors.isDark, radius: _kIndicatorHeight / 2) : ShapeDecoration(shape: indicatorShape ?? _kNavigationShape, color: (Pref.modernCardUi && !Pref.iosStyleUi) ? Colors.transparent : effectiveIndicatorColor), child: (Pref.modernCardUi && !Pref.iosStyleUi) ? Align(alignment: Alignment.bottomCenter, child: Container(width: 16, height: 3, decoration: BoxDecoration(color: colors.primary, borderRadius: BorderRadius.circular(1.5)))) : null,
                   ),
                 ),
                 Row(
