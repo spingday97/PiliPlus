@@ -480,7 +480,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
   ) {
     final isNeu = NeuStyle.enabled; final isDark = Theme.of(context).brightness == Brightness.dark; final items = <Widget>[
           Obx(
-            () => ActionItem(
+            () => ActionItem(expand: !isNeu, 
               animation: introController.tripleAnimation,
               icon: const Icon(FontAwesomeIcons.thumbsUp),
               selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
@@ -492,7 +492,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
             ),
           ),
           Obx(
-            () => ActionItem(
+            () => ActionItem(expand: !isNeu, 
               icon: const Icon(FontAwesomeIcons.thumbsDown),
               selectIcon: const Icon(FontAwesomeIcons.solidThumbsDown),
               onTap: () => introController.handleAction(
@@ -504,7 +504,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
             ),
           ),
           Obx(
-            () => ActionItem(
+            () => ActionItem(expand: !isNeu, 
               animation: introController.tripleAnimation,
               icon: const Icon(FontAwesomeIcons.b),
               selectIcon: const Icon(FontAwesomeIcons.b),
@@ -515,7 +515,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
             ),
           ),
           Obx(
-            () => ActionItem(
+            () => ActionItem(expand: !isNeu, 
               animation: introController.tripleAnimation,
               icon: const Icon(FontAwesomeIcons.star),
               selectIcon: const Icon(FontAwesomeIcons.solidStar),
@@ -529,20 +529,20 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
               text: !isLoading ? NumUtils.numFormat(stat!.favorite) : null,
             ),
           ),
-          ActionItem(
+          ActionItem(expand: !isNeu, 
             icon: const Icon(CustomIcons.download),
             onTap: () => videoDetailCtr.onDownload(context),
             text: '缓存',
             semanticsLabel: '缓存',
           ),
-         ActionItem(
+         ActionItem(expand: !isNeu, 
               icon: const Icon(Icons.audiotrack_rounded),
              onTap: () => AudioExtractSheet.show(context, videoDetailCtr),
              text: '提取音频',
              semanticsLabel: '提取音频',
           ),
             Obx(
-            () => ActionItem(
+            () => ActionItem(expand: !isNeu, 
               icon: const Icon(FontAwesomeIcons.clock),
               selectIcon: const Icon(FontAwesomeIcons.solidClock),
               onTap: () =>
@@ -552,14 +552,14 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
               text: '再看',
             ),
           ),
-          ActionItem(
+          ActionItem(expand: !isNeu, 
             icon: const Icon(FontAwesomeIcons.shareFromSquare),
             onTap: () => introController.actionShareVideo(context),
             selectStatus: false,
             semanticsLabel: '分享',
             text: !isLoading ? NumUtils.numFormat(stat!.share!) : null,
           ),
-        ]; return SizedBox(height: isNeu ? 56 : 48, child: Row(crossAxisAlignment: .start, children: isNeu ? items.map((item) => Expanded(child: Container(margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 2), decoration: NeuStyle.raised(isDark: isDark, radius: 14, blur: 7, offset: 3), child: item))).toList() : items));
+        ]; return SizedBox(height: isNeu ? 58 : 48, child: Row(crossAxisAlignment: .start, children: isNeu ? items.map((item) => Expanded(child: Container(margin: const EdgeInsets.symmetric(horizontal: 3), padding: const EdgeInsets.symmetric(vertical: 4), decoration: NeuStyle.raised(isDark: isDark, radius: 12, blur: 6, offset: 2.5), child: item))).toList() : items));
       }
 
   static final RegExp urlRegExp = RegExp(
