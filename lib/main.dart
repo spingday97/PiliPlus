@@ -302,8 +302,10 @@ class MyApp extends StatelessWidget {
     );
     if (Pref.iosStyleUi) {
       light = light.copyWith(
-        scaffoldBackgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), 5 => const Color(0xFFF6F5FC), 6 => const Color(0xFFFAF7F2), 7 => const Color(0xFFF4F7FA), 8 => const Color(0xFFFAF5F6), _ => const Color(0xFFF2F2F7) },
-        cardTheme: CardThemeData(
+        splashFactory: NoSplash.splashFactory, highlightColor: const Color(0x0D000000),
+        colorScheme: light.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF007AFF) : null, surface: Colors.white, surfaceContainerLowest: const Color(0xFFF2F2F7), surfaceContainerLow: Colors.white, surfaceContainer: const Color(0xFFE5E5EA)),
+    scaffoldBackgroundColor: const Color(0xFFF2F2F7), listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
+       cardTheme: CardThemeData(
           color: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
@@ -315,7 +317,7 @@ class MyApp extends StatelessWidget {
         dividerTheme: const DividerThemeData(color: Color(0x1A000000), thickness: 0.5, space: 0.5),
       );
       dark = dark.copyWith(
-        scaffoldBackgroundColor: switch (Pref.colorPreset) { 4 => Colors.black, 9 => const Color(0xFF12151C), _ => const Color(0xFF000000) },
+      splashFactory: NoSplash.splashFactory, highlightColor: const Color(0x14FFFFFF), colorScheme: dark.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF0A84FF) : null, surface: const Color(0xFF1C1C1E), surfaceContainerLowest: Colors.black, surfaceContainerLow: const Color(0xFF1C1C1E), surfaceContainer: const Color(0xFF2C2C2E)), scaffoldBackgroundColor: Colors.black, listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
         cardTheme: CardThemeData(
           color: switch (Pref.colorPreset) { 4 => const Color(0xFF161920), 9 => const Color(0xFF1C212B), _ => const Color(0xFF1C1C1E) },
           elevation: 0,
