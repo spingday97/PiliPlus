@@ -26,9 +26,8 @@ class AudioExtractSheet extends StatefulWidget {
 
  static void show(BuildContext context, VideoDetailController videoDetailCtr) {
    try {
-       final hostCtx = Get.context ?? context;
       showModalBottomSheet(
-        context: hostCtx,
+        context: context,
         useSafeArea: true,
         isScrollControlled: true,
         builder: (sheetCtx) => SafeArea(
