@@ -7,6 +7,7 @@ import 'package:PiliPlus/pages/live_follow/view.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/extension/num_ext.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:get/get.dart';
@@ -28,7 +29,7 @@ class UpPanel extends StatefulWidget {
 
 class _UpPanelState extends State<UpPanel> {
   late final controller = widget.dynamicsController;
-  late final isTop = controller.upPanelPosition == UpPanelPosition.top;
+  late final isTop = NeuStyle.enabled || controller.upPanelPosition == UpPanelPosition.top;
 
   void toFollowPage() => Get.to(const LiveFollowPage());
 
