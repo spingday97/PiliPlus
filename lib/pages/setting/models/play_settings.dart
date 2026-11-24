@@ -414,7 +414,7 @@ final orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
 final prioritized = List.generate(order.length, (_) => <SettingsModel>[]);
 final rest = <SettingsModel>[];
 for (final item in list) {
-final title = item.title ?? item.getTitle?.call() ?? '';
+final title =item.title ?? '' ;
 final idx = orderMap[title];
 if (idx != null) { prioritized[idx].add(item); } else { rest.add(item); }
 }
