@@ -118,7 +118,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
               child: TranslucentColumn(
                 crossAxisAlignment: .start,
                 children: [
-             if (Pref.modernCardUi && !isHorizontal) ...[Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.14), width: 0.8)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [NoTranslucentArea(child: _buildOwnerInfo(isLoading, isPortrait, isHorizontal, videoDetail)), const SizedBox(height: 10), _buildTitle(isLoading, isHorizontal, videoDetail), const SizedBox(height: 8), Stack(clipBehavior: Clip.none, children: [_buildInfo(videoDetail.stat, videoDetail.pubdate), if (introController.enableAi) _aiBtn]), if (introController.showArgueMsg) if (videoDetail.argueInfo?.argueMsg case final argueMsg? when argueMsg.isNotEmpty) ...[const SizedBox(height: 4), _buildArgueInfo(argueMsg)]]))] else ...[
+             if (NeuStyle.enabled) ...[Container(padding: const EdgeInsets.all(12), decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 18, blur: 12, offset: 5), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [NoTranslucentArea(child: _buildOwnerInfo(isLoading, isPortrait, isHorizontal, videoDetail)), const SizedBox(height: 10), _buildTitle(isLoading, isHorizontal, videoDetail), const SizedBox(height: 8), Stack(clipBehavior: Clip.none, children: [_buildInfo(videoDetail.stat, videoDetail.pubdate), if (introController.enableAi) _aiBtn]), if (introController.showArgueMsg) if (videoDetail.argueInfo?.argueMsg case final argueMsg? when argueMsg.isNotEmpty) ...[const SizedBox(height: 4), _buildArgueInfo(argueMsg)]]))] else if (Pref.modernCardUi && !isHorizontal) ...[Container(padding: const EdgeInsets.all(14), decoration: BoxDecoration(color: Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.14), width: 0.8)), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [NoTranslucentArea(child: _buildOwnerInfo(isLoading, isPortrait, isHorizontal, videoDetail)), const SizedBox(height: 10), _buildTitle(isLoading, isHorizontal, videoDetail), const SizedBox(height: 8), Stack(clipBehavior: Clip.none, children: [_buildInfo(videoDetail.stat, videoDetail.pubdate), if (introController.enableAi) _aiBtn]), if (introController.showArgueMsg) if (videoDetail.argueInfo?.argueMsg case final argueMsg? when argueMsg.isNotEmpty) ...[const SizedBox(height: 4), _buildArgueInfo(argueMsg)]]))] else ...[
                  NoTranslucentArea(
                     child: _buildOwnerInfo(
                       isLoading,
@@ -478,11 +478,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
     UgcIntroController introController,
     VideoStat? stat,
   ) {
-    final grid = SizedBox(
-      height: 48,
-      child: Row(
-        crossAxisAlignment: .start,
-        children: [
+    final isNeu = NeuStyle.enabled; final isDark = Theme.of(context).brightness == Brightness.dark; final items = <Widget>[
           Obx(
             () => ActionItem(
               animation: introController.tripleAnimation,
@@ -563,18 +559,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
             semanticsLabel: '分享',
             text: !isLoading ? NumUtils.numFormat(stat!.share!) : null,
           ),
-        ],
-      ),
-    );
-      if (NeuStyle.enabled) {
-          return Container(
-             margin: const EdgeInsets.symmetric(vertical: 6),
-             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-             decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 16, blur: 10, offset: 4),
-              child: grid,
-      );
-      }
-      return grid;
+        ]; return SizedBox(height: isNeu ? 56 : 48, child: Row(crossAxisAlignment: .start, children: isNeu ? items.map((item) => Expanded(child: Container(margin: const EdgeInsets.symmetric(horizontal: 3, vertical: 2), decoration: NeuStyle.raised(isDark: isDark, radius: 14, blur: 7, offset: 3), child: item))).toList() : items));
       }
 
   static final RegExp urlRegExp = RegExp(
