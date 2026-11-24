@@ -17,6 +17,7 @@ import 'package:PiliPlus/pages/dynamics_tab/view.dart';
 import 'package:PiliPlus/pages/main/controller.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/extension/get_ext.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
@@ -181,7 +182,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
   }
 
   Widget upPanelPart(ColorScheme colorScheme) {
-    final isTop = upPanelPosition == .top;
+    final isTop = NeuStyle.enabled || upPanelPosition == .top;
     final needBg = upPanelPosition.index > 2;
     final panel = Material(
       type: needBg ? .canvas : .transparency,
@@ -208,7 +209,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
       margin: isTop
           ? const .fromLTRB(10, 4, 10, 6)
           : const .fromLTRB(8, 6, 4, 8),
-      decoration: BoxDecoration(
+      decoration: NeuStyle.enabled ? NeuStyle.inset(isDark: colorScheme.brightness == Brightness.dark, radius: 18) : BoxDecoration(
         color: colorScheme.surfaceContainerLow,
         borderRadius: .circular(16),
         border: .all(
@@ -282,7 +283,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
       if (_useLiveFirstLayout) {
         actions = _actionPill(colorScheme);
       } else {
-        switch (upPanelPosition) {
+        if (NeuStyle.enabled) { child = Column(children: [upPanelPart(colorScheme), Expanded(child: child)]); actions = _actionPill(colorScheme); } else switch (upPanelPosition) {
           case .top:
             child = Column(
               children: [
