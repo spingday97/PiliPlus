@@ -93,7 +93,7 @@ class _SetSwitchItemState extends State<SetSwitchItem> {
       color: theme.colorScheme.outline,
     );
 
-    final switchBtn =Pref.modernCardUi ? Transform.scale(scale: 0.86, alignment: Alignment.centerRight, child: CupertinoSwitch(value: val, activeTrackColor: theme.colorScheme.primary, onChanged: switchChange)) :  Transform.scale(
+    final switchBtn =Pref.iosStyleUi ? Transform.scale(scale: 0.86, alignment: Alignment.centerRight, child: CupertinoSwitch(value: val, activeTrackColor: theme.colorScheme.primary, onChanged: switchChange)) :  Transform.scale(
       scale: 0.8,
       alignment: .centerRight,
       child: Switch(
