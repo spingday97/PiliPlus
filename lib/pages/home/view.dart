@@ -8,6 +8,7 @@ import 'package:PiliPlus/pages/main/controller.dart';
 import 'package:PiliPlus/pages/mine/controller.dart';
 import 'package:PiliPlus/utils/extension/get_ext.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
@@ -44,7 +45,7 @@ class _HomePageState extends CommonPageState<HomePage>
     final isModern = Pref.modernCardUi; final isIos = Pref.iosStyleUi;
     Widget tabBar;
     if (_homeController.tabs.length > 1) {
-      tabBar = isIos ? Container(margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), padding: const EdgeInsets.all(3), decoration: BoxDecoration(color: _colorScheme.surfaceContainer, borderRadius: BorderRadius.circular(12)), child: TabBar(controller: _homeController.tabController, tabs: _homeController.tabs.map((e) => Tab(text: e.label)).toList(), isScrollable: true, dividerColor: Colors.transparent, dividerHeight: 0, splashBorderRadius: Style.mdRadius, tabAlignment: TabAlignment.center, indicatorSize: TabBarIndicatorSize.tab, indicator: BoxDecoration(color: _colorScheme.surface, borderRadius: BorderRadius.circular(9), boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 4, offset: Offset(0, 1))]), labelColor: _colorScheme.onSurface, unselectedLabelColor: _colorScheme.outline, onTap: (_) { feedBack(); if (!_homeController.tabController.indexIsChanging) { _homeController.animateToTop(); } })) : Padding(
+      tabBar = isIos ? Container(margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), padding: const EdgeInsets.all(3), decoration: NeuStyle.inset(isDark: Theme.of(context).brightness == Brightness.dark, radius: 14), child: TabBar(controller: _homeController.tabController, tabs: _homeController.tabs.map((e) => Tab(text: e.label)).toList(), isScrollable: true, dividerColor: Colors.transparent, dividerHeight: 0, splashBorderRadius: Style.mdRadius, tabAlignment: TabAlignment.center, indicatorSize: TabBarIndicatorSize.tab, indicator: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 10, blur: 6, offset: 2), labelColor: _colorScheme.onSurface, unselectedLabelColor: _colorScheme.outline, onTap: (_) { feedback(); if (!_homeController.tabController.indexIsChanging) { _homeController.animateToTop(); } })) : Padding(
         padding: const EdgeInsets.only(top: 4),
         child: SizedBox(
           height: 42,
