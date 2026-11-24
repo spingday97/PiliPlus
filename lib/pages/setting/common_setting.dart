@@ -3,6 +3,7 @@ import 'package:PiliPlus/models/common/setting_type.dart';
 import 'package:PiliPlus/pages/setting/models/model.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:material_ui/material_ui.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 
 class CommonSetting extends StatefulWidget {
   const CommonSetting({
@@ -51,7 +52,7 @@ class _CommonSettingState extends State<CommonSetting> {
     final showAppBar = widget.showAppBar;
     return SimpleScaffold(
       appBar: showAppBar ? AppBar(title: Text(widget.settingType.title)) : null,
-      body: Pref.iosStyleUi ? SingleChildScrollView(key: ValueKey(widget.settingType), padding: EdgeInsets.fromLTRB(16 + (showAppBar ? padding.left : 0), 10, 16 + (showAppBar ? padding.right : 0), padding.bottom + 100), child: Container(decoration: BoxDecoration(color: Theme.of(context).cardTheme.color ?? Theme.of(context).colorScheme.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: Theme.of(context).dividerColor, width: 0.5)), clipBehavior: Clip.antiAlias, child: Column(mainAxisSize: MainAxisSize.min, children: [for (int i = 0; i < settings.length; i++) ...[if (i > 0) const Divider(height: 0.5, thickness: 0.5), settings[i].widget]]))) : ListView.builder(
+      body: Pref.iosStyleUi ? SingleChildScrollView(key: ValueKey(widget.settingType), padding: EdgeInsets.fromLTRB(16 + (showAppBar ? padding.left : 0), 10, 16 + (showAppBar ? padding.right : 0), padding.bottom + 100), child: Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 18, blur: 12, offset: 5), clipBehavior: Clip.antiAlias, child: Column(mainAxisSize: MainAxisSize.min, children: [for (int i = 0; i < settings.length; i++) ...[if (i > 0) const Divider(height: 0.5, thickness: 0.5), settings[i].widget]]))) : ListView.builder(
         key: ValueKey(widget.settingType),
         padding: EdgeInsets.only(
           top: Pref.modernCardUi ? 8 : 0,
