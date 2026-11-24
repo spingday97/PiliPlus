@@ -24,12 +24,8 @@ class AudioExtractSheet extends StatefulWidget {
 
   final VideoDetailController videoDetailCtr;
 
-  static Future<void> show(
-  BuildContext context,
-  VideoDetailController videoDetailCtr,
-  ) async {
-    await Future.delayed(const Duration(milliseconds: 50));
-    if (!context.mounted) return;
+ static void show(BuildContext context, VideoDetailController videoDetailCtr) {
+   try {
     showModalBottomSheet(
       context: context,
       useSafeArea: true,
@@ -39,6 +35,7 @@ class AudioExtractSheet extends StatefulWidget {
       ),
       builder: (_) => AudioExtractSheet(videoDetailCtr: videoDetailCtr),
     );
+     } catch (e) { SmartDialog.showToast('打开失败: $e'); }
   }
 
   @override
