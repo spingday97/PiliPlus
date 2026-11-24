@@ -79,7 +79,7 @@ class FloatingNavigationBar extends StatelessWidget {
     final itemWidth = innerWidth / destinations.length;
     final effectiveIndicatorColor =
         indicatorColor ??
-        (Pref.modernCardUi ? colors.primary.withValues(alpha: 0.12) : navigationBarTheme.indicatorColor ??
+        (Pref.iosStyleUi ? colors.primary.withValues(alpha: 0.12) : navigationBarTheme.indicatorColor ??
         defaults.indicatorColor)!;
 
     final baseBg = ElevationOverlay.applySurfaceTint(
@@ -104,7 +104,7 @@ class FloatingNavigationBar extends StatelessWidget {
         width: totalWidth,
         child: DecoratedBox(
           decoration: ShapeDecoration(
-            color: Pref.modernCardUi ? (colors.isDark ? const Color(0xFF1C1C1E).withValues(alpha: 0.90) : Colors.white.withValues(alpha: 0.90)) : baseBg.withValues(alpha: 0.94),
+            color: Pref.iosStyleUi ? (colors.isDark ? const Color(0xFF1C1C1E).withValues(alpha: 0.90) : Colors.white.withValues(alpha: 0.90)) : baseBg.withValues(alpha: 0.94),
             shadows: [
               BoxShadow(
                 color: colors.isDark
@@ -115,7 +115,7 @@ class FloatingNavigationBar extends StatelessWidget {
               ),
             ],
             shape: RoundedSuperellipseBorder(
-              side: Pref.modernCardUi ? BorderSide(color: colors.isDark ? Colors.white.withValues(alpha: 0.14) : Colors.black.withValues(alpha: 0.08), width: 0.6) : defaults.borderSide,
+              side: Pref.iosStyleUi ? BorderSide(color: colors.isDark ? Colors.white.withValues(alpha: 0.14) : Colors.black.withValues(alpha: 0.08), width: 0.6) : defaults.borderSide,
               borderRadius: _kBorderRadius,
             ),
           ),
