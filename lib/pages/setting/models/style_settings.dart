@@ -390,22 +390,18 @@ List<SettingsModel> get styleSettings => _prioritizeStyle([
     subtitle: '删除或调换动态标签页',
     leading: const Icon(Icons.toc_outlined),
   ),
-  SwitchModel(
-    title: '现代轻卡片界面',
-    subtitle: '浅灰画布配纯白大圆角卡片，关闭为经典原版',
-    leading: const Icon(Icons.style_outlined),
-    setKey: SettingBoxKey.modernCardUi,
-    defaultVal: false,
-    onChanged: (_) => Get.forceAppUpdate(),
-  ),
-  SwitchModel(
-    title: 'iOS 风格界面',
-    subtitle: '切换为 iOS 分组卡片、居中标题栏与 Cupertino 开关',
-    leading: const Icon(Icons.style_outlined),
-    setKey: SettingBoxKey.iosStyleUi,
-    defaultVal: false,
-    onChanged: (_) => Get.forceAppUpdate(),
-  ),
+ PopupModel<_UiStyle>(
+     title: '界面风格',
+     leading: const Icon(Icons.style_outlined),
+     value: () => Pref.iosStyleUi ? _UiStyle.ios : (Pref.modernCardUi ? _UiStyle.modern : _UiStyle.md3),
+     items: _UiStyle.values,
+     onSelected: (value, setState) {
+         GStorage.setting.put(SettingBoxKey.modernCardUi, value == _UiStyle.modern);
+         GStorage.setting.put(SettingBoxKey.iosStyleUi, value == _UiStyle.ios);
+         setState();
+         Get.forceAppUpdate();
+         },
+     ),
   PopupModel<_ColorPreset>(
     title: '全局预设配色',
     leading: const Icon(Icons.palette_outlined),
@@ -460,7 +456,7 @@ List<SettingsModel> get styleSettings => _prioritizeStyle([
     ),
 ]);
 List<SettingsModel> _prioritizeStyle(List<SettingsModel> list) {
-    const order = ['iOS 风格界面', '现代轻卡片界面', '全局预设配色', '主题模式', '纯黑主题', '应用主题', '桌面应用图标', '屏幕帧率', 'App字体设置', '悬浮底栏', 'MD3样式底栏', 'Navbar编辑', '我的页卡片', '默认启动页', '页面过渡动画'];
+    const order = ['界面风格', '全局预设配色', '主题模式', '纯黑主题', '应用主题', '桌面应用图标', '屏幕帧率', 'App字体设置', '悬浮底栏', 'MD3样式底栏', 'Navbar编辑', '我的页卡片', '默认启动页', '页面过渡动画'];
     final orderMap = {for (var i = 0; i < order.length; i++) order[i]: i};
 final prioritized = List.generate(order.length, (_) => <SettingsModel>[]);
 final rest = <SettingsModel>[];
@@ -471,7 +467,16 @@ if (idx != null) { prioritized[idx].add(item); } else { rest.add(item); }
 }
 return [for (final bucket in prioritized) ...bucket, ...rest];
 }
-    
+    enum _UiStyle implements EnumWithLabel {
+    md3(0, '原版 MD3'),
+        modern(1, '现代轻卡片'),
+        ios(2, 'iOS 极简');
+        final int code;
+        @override
+        final String label;
+        const _UiStyle(this.code, this.label);
+    }
+
 enum _ColorPreset implements EnumWithLabel {
   followTheme(0, '默认跟随主题'),
   morandiSlate(1, '莫兰迪灰蓝'),
