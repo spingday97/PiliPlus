@@ -470,7 +470,7 @@ return [for (final bucket in prioritized) ...bucket, ...rest];
     enum _UiStyle implements EnumWithLabel {
     md3(0, '原版 MD3'),
         modern(1, '现代轻卡片'),
-        ios(2, 'iOS 极简');
+        ios(2, '新拟态风');
         final int code;
         @override
         final String label;
