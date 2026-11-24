@@ -15,6 +15,7 @@ import 'package:PiliPlus/pages/history/controller.dart';
 import 'package:PiliPlus/pages/history/widgets/item.dart';
 import 'package:PiliPlus/utils/extension/scroll_controller_ext.dart';
 import 'package:PiliPlus/utils/grid.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:get/get.dart';
@@ -66,7 +67,8 @@ class _HistoryPageState extends State<HistoryPage>
     super.build(context);
     final padding = MediaQuery.viewPaddingOf(context);
     final isModern = Pref.modernCardUi;
-    Widget child = refreshIndicator(
+    final isNeu = NeuStyle.enabled;
+      Widget child = refreshIndicator(
       onRefresh: _historyController.onRefresh,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -119,20 +121,20 @@ class _HistoryPageState extends State<HistoryPage>
                   children: [
                     ?_buildPauseTip,
                     Padding(
-                      padding: isModern
+                      padding: isNeu || isModern
                           ? const .symmetric(horizontal: 14, vertical: 2)
                           : EdgeInsets.zero,
-                      child: TabBar(
+                      child: DecoratedBox(decoration: isNeu ? NeuStyle.inset(isDark: Theme.of(context).brightness == Brightness.dark, radius: 12) : const BoxDecoration(), child: TabBar(
                         controller: _historyController.tabController,
                         dividerHeight: 0,
-                        indicatorSize: isModern
+                        indicatorSize: isNeu || isModern
                             ? TabBarIndicatorSize.tab
                             : TabBarIndicatorSize.label,
-                        indicatorWeight: isModern ? 0 : 3,
-                        indicatorPadding: isModern
+                        indicatorWeight: isNeu || isModern ? 0 : 3,
+                        indicatorPadding: isNeu ? const .all(4) : isModern
                             ? const .symmetric(vertical: 4)
                             : EdgeInsets.zero,
-                        indicator: isModern
+                        indicator: isNeu ? NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 9, blur: 6, offset: 2) : isModern
                             ? BoxDecoration(
                                 color: colorScheme.primary,
                                 borderRadius: .circular(18),
@@ -169,7 +171,8 @@ class _HistoryPageState extends State<HistoryPage>
                           const Tab(height: 38, text: '全部'),
                           ...tabs.map((item) => Tab(height: 38, text: item.name)),
                         ],
-                      ),
+                      ),),
+                      
                     ),
                     Expanded(
                       child: TabBarView(
@@ -200,7 +203,8 @@ class _HistoryPageState extends State<HistoryPage>
   AppBar get _buildAppBar {
     final colorScheme = Theme.of(context).colorScheme;
     final isModern = Pref.modernCardUi;
-    final menuBtn = PopupMenuButton(
+    final isNeu = NeuStyle.enabled;
+      final menuBtn = PopupMenuButton(
       itemBuilder: (_) => [
         PopupMenuItem(
           onTap: () => _historyController.baseCtr.onPauseHistory(context),
@@ -236,7 +240,7 @@ class _HistoryPageState extends State<HistoryPage>
         ),
       ],
     );
-    if (isModern) {
+    if (isNeu || isModern) {
       return AppBar(
         automaticallyImplyLeading: !widget.isTab,
         toolbarHeight: 50,
@@ -433,13 +437,14 @@ class _HistoryPageState extends State<HistoryPage>
   Widget _buildBody(LoadingState<List<HistoryItemModel>?> loadingState) {
     final colorScheme = Theme.of(context).colorScheme;
     final isModern = Pref.modernCardUi;
-    return switch (loadingState) {
+    final isNeu = NeuStyle.enabled;
+      return switch (loadingState) {
       Loading() => gridSkeleton,
       Success(:final response) =>
         response != null && response.isNotEmpty
             ? SliverMainAxisGroup(
                 slivers: [
-                  if (isModern && widget.type == null)
+                  if ((isNeu || isModern) && widget.type == null)
                     SliverToBoxAdapter(
                       child: _buildContinueWatchingStrip(
                         response
@@ -461,7 +466,7 @@ class _HistoryPageState extends State<HistoryPage>
                       }
                       final item = response[index];
                       return DecoratedBox(
-                        decoration: BoxDecoration(
+                        decoration: isNeu ? NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 16, blur: 10, offset: 4) : BoxDecoration(
                           color: isModern
                               ? colorScheme.surface
                               : colorScheme.surfaceContainerLow,
