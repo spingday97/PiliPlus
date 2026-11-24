@@ -264,6 +264,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     final colorScheme = ColorScheme.of(context);
     final isModern = Pref.modernCardUi;
     final isIos = Pref.iosStyleUi;
+    final isDark = colorScheme.brightness == Brightness.dark;
     Widget? drawer;
     Widget? endDrawer;
 
@@ -278,12 +279,13 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     );
 
     Widget child = tabView;
+    final neuTabBar = isIos ? Container(margin: const EdgeInsets.symmetric(horizontal: 14, vertical: 6), padding: const EdgeInsets.all(4), decoration: NeuStyle.inset(isDark: isDark, radius: 14), child: SizedBox(height: 36, child: TabBar(dividerHeight: 0, isScrollable: false, dividerColor: Colors.transparent, indicatorSize: TabBarIndicatorSize.tab, indicatorWeight: 0, indicator: NeuStyle.raised(isDark: isDark, radius: 10, blur: 6, offset: 2), labelColor: colorScheme.onSurface, unselectedLabelColor: colorScheme.outline, controller: _dynamicsController.tabController, labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600), unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.normal), tabs: _dynamicsController.tabs.map((e) => Tab(text: e.label)).toList(), onTap: (index) { if (!_dynamicsController.tabController.indexIsChanging) { _dynamicsController.animateToTop(); } }))) : null;
     
-    if (!isModern) {
-      if (_useLiveFirstLayout) {
+    if (!isModern || isIos) {
+      if (_useLiveFirstLayout && !isIos) {
         actions = _actionPill(colorScheme);
       } else {
-        if (NeuStyle.enabled) { child = Column(children: [upPanelPart(colorScheme), Expanded(child: child)]); actions = _actionPill(colorScheme); } else switch (upPanelPosition) {
+        if (NeuStyle.enabled) { child = Column(children: [if (neuTabBar != null) neuTabBar, upPanelPart(colorScheme), Expanded(child: child)]); actions = Row(mainAxisSize: MainAxisSize.min, children: [Container(width: 36, height: 36, margin: const EdgeInsets.only(right: 10), decoration: NeuStyle.raised(isDark: isDark, radius: 18, blur: 7, offset: 3), child: IconButton(padding: EdgeInsets.zero, constraints: const BoxConstraints(), tooltip: '搜索关注的 UP 主', icon: const Icon(Icons.search, size: 19), onPressed: () => _showSearchUpSheet(context))), Container(width: 36, height: 36, margin: const EdgeInsets.only(right: 14), decoration: NeuStyle.raised(isDark: isDark, radius: 18, blur: 7, offset: 3), child: IconButton(padding: EdgeInsets.zero, constraints: const BoxConstraints(), tooltip: '发布动态', icon: const Icon(Icons.add, size: 20), onPressed: () => CreateDynPanel.onCreateDyn(context)))]); } else switch (upPanelPosition) {
           case .top:
             child = Column(
               children: [
@@ -364,8 +366,8 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
       appBar: PreferredSize(
-        preferredSize: .fromHeight(isModern ? 94 : 50),
-        child: isModern
+        preferredSize: .fromHeight(isModern && !isIos ? 94 : 50),
+        child: isModern && !isIos
             ? Builder(builder: (context) { Widget buildHeader(double offset) => Material(color: Theme.of(context).scaffoldBackgroundColor, child: Column(mainAxisSize: .min,
                 crossAxisAlignment: .start,
                 children: [
@@ -403,7 +405,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
                   ),), SizedBox(height: 44, child: Row(children: [Expanded(child: tabBar), if (offset > 2) Opacity(opacity: (offset / 50.0).clamp(0.0, 1.0), child: Row(mainAxisSize: .min, children: [_circleIconBtn(colorScheme, icon: Icons.search, tooltip: '搜索关注的 UP 主', size: 32, iconSize: 17, onPressed: () => _showSearchUpSheet(context)), const SizedBox(width: 6), _circleIconBtn(colorScheme, icon: Icons.add, tooltip: '发布动态', primary: true, size: 32, iconSize: 17, onPressed: () => CreateDynPanel.onCreateDyn(context)), const SizedBox(width: 12)]))])),
                 ],
               )
-            ); if (_mainController.barOffset case final barOffset?) { return Obx(() => buildHeader(barOffset.value.clamp(0.0, 50.0))); } return buildHeader(0.0); }) : Row(
+            ); if (_mainController.barOffset case final barOffset?) { return Obx(() => buildHeader(barOffset.value.clamp(0.0, 50.0))); } return buildHeader(0.0); }) :isIos ? AppBar(primary: false, automaticallyImplyLeading: false, centerTitle: false, toolbarHeight: 50, backgroundColor: Colors.transparent, elevation: 0, scrolledUnderElevation: 0, title: const Text('动态', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700)), actions: [if (actions != null) actions]) :  Row(
                 children: [
                   ?leading,
                   Expanded(child: tabBar),
