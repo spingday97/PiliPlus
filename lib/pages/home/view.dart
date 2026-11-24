@@ -87,6 +87,7 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
     
     return Column(
       children: [
+        Container(height: MediaQuery.paddingOf(context).top, color: Theme.of(context).scaffoldBackgroundColor),
         if (!_mainController.useSideBar && MediaQuery.isPortraitOf(context))
           customAppBar(),
         tabBar,
