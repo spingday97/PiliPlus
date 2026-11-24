@@ -25,6 +25,7 @@ import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:flutter/services.dart' show SystemUiOverlayStyle;
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
@@ -227,13 +228,7 @@ else
     bool isLarge = false,
   }) {
     final theme = Theme.of(context); final isIos = Pref.iosStyleUi; final radius = BorderRadius.circular(isIos ? 14 : (isLarge ? 20 : 16)); 
-    return Material(
-      color: bgColor,
-      shape: RoundedRectangleBorder(borderRadius: radius, side: BorderSide(color: isIos ? theme.dividerColor : borderColor, width: isIos ? 0.5 : 1)), clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: radius,
-        child: Padding(
+   final tileChild = Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 16,
             vertical: isLarge ? 20 : 14,
@@ -252,12 +247,10 @@ else
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),),
-          if (isIos) Icon(Icons.chevron_right_rounded, size: 18, color: theme.colorScheme.outline.withValues(alpha: 0.55)),     //),
+          if (isIos && !NeuStyle.enabled) Icon(Icons.chevron_right_rounded, size: 18, color: theme.colorScheme.outline.withValues(alpha: 0.55)),     //),
             ],
           ),
-        ),
-      ),
-    );
+        ); if (NeuStyle.enabled) { return Container(decoration: NeuStyle.raised(isDark: theme.brightness == Brightness.dark, radius: 18, blur: 12, offset: 5), child: Material(color: Colors.transparent, borderRadius: BorderRadius.circular(18), clipBehavior: Clip.antiAlias, child: InkWell(onTap: onTap, borderRadius: BorderRadius.circular(18), child: tileChild))); } return Material(color: bgColor, shape: RoundedRectangleBorder(borderRadius: radius, side: BorderSide(color: isIos ? theme.dividerColor : borderColor, width: isIos ? 0.5 : 1)), clipBehavior: Clip.antiAlias, child: InkWell(onTap: onTap, borderRadius: radius, child: tileChild));
   }
 
   Widget _buildTopBannerAndUser(
