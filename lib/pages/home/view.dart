@@ -164,7 +164,6 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
         NeuStyle.enabled ? Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 20, blur: 8, offset: 3), child: userAvatar(colorScheme: _colorScheme, mainController: _mainController)) : userAvatar(colorScheme: _colorScheme, mainController: _mainController),
       ],
     );
-   if (Pref.modernCardUi) { return Container(height: Style.topBarHeight, padding: padding, child: child); }
     if (_homeController.hideTopBar) {
       if (_mainController.barOffset case final barOffset?) {
         return Obx(
