@@ -75,6 +75,17 @@ abstract final class LiveHttp {
       }),
     );
     if (res.data['code'] == 0) {
+     final msg = res.data['msg']?.toString() ?? '';
+     if (msg.isNotEmpty) {
+      final reason = switch (msg) {
+         'f' => '发送失败：内容包含屏蔽词',
+         'k' => '发送失败：内容被系统拦截',
+         'msg in 1s' => '发送失败：发言过于频繁',
+         'max limit' => '发送失败：已达弹幕长度上限',
+         _ => '发送失败：$msg',
+         };
+       return Error(reason);
+     }
       return const Success(null);
     } else {
       return Error(res.data['message']);
