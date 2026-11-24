@@ -26,9 +26,25 @@ class AudioExtractSheet extends StatefulWidget {
 
  static void show(BuildContext context, VideoDetailController videoDetailCtr) {
    try {
-    Get.bottomSheet(Container(constraints: BoxConstraints(maxHeight: Get.height * 0.72), decoration: BoxDecoration(color: Theme.of(Get.context ?? context).cardTheme.color ?? Theme.of(Get.context ?? context).colorScheme.surface, borderRadius: const BorderRadius.vertical(top: Radius.circular(20))), child: SafeArea(top: false, child: AudioExtractSheet(videoDetailCtr: videoDetailCtr))), isScrollControlled: true);
-     } catch (e) { SmartDialog.showToast('打开失败: $e'); }
-  }
+       final hostCtx = Get.context ?? context;
+      showModalBottomSheet(
+        context: hostCtx,
+        useSafeArea: true,
+        isScrollControlled: true,
+        builder: (sheetCtx) => SafeArea(
+          top: false,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheetCtx).height * 0.72,
+            ),
+            child: AudioExtractSheet(videoDetailCtr: videoDetailCtr),
+          ),
+        ),
+      );
+    } catch (e) {
+      SmartDialog.showToast('打开失败: $e');
+   }
+   }
 
   @override
   State<AudioExtractSheet> createState() => _AudioExtractSheetState();
