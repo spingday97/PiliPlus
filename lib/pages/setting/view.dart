@@ -310,13 +310,14 @@ class _SettingPageState extends State<SettingPage> {
       required VoidCallback onTap,
       Color? iconColor,
       bool selected = false,
+      String? statusPill,
     }) {
       final color = iconColor ?? theme.colorScheme.primary; final isDark = theme.brightness == Brightness.dark; final isModernCard = Pref.modernCardUi && !NeuStyle.enabled;
       final tile = ListTile(
         selected: selected,
         tileColor: selected ? theme.colorScheme.onInverseSurface : null,
         onTap: onTap,
-        leading: NeuStyle.enabled ? Container(width: 36, height: 36, decoration: NeuStyle.raised(isDark: isDark, radius: 18, blur: 6, offset: 2.5), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : isModernCard ? Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.14), shape: BoxShape.circle), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : Pref.iosStyleUi ? Container(
+        leading: NeuStyle.enabled ? Container(width: 36, height: 36, decoration: NeuStyle.raised(isDark: isDark, radius: 18, blur: 6, offset: 2.5), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : isModernCard ? Container(width: 36, height: 36, decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [color, color.withValues(alpha: 0.72)])), child: Center(child: IconTheme(data: const IconThemeData(color: Colors.white, size: 19), child: icon))) : Pref.iosStyleUi ? Container(
           width: 28,
           height: 28,
           decoration: BoxDecoration(
@@ -330,7 +331,7 @@ class _SettingPageState extends State<SettingPage> {
         ) : icon,
         title: Text(title, style: titleStyle),
         subtitle: subtitle == null ? null : Text(subtitle, style: subTitleStyle),
-        trailing: NeuStyle.enabled || isModernCard || Pref.iosStyleUi ?  Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.outline.withValues(alpha: 0.55)) : null,
+               trailing: statusPill != null ? Row(mainAxisSize: MainAxisSize.min, children: [Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: color.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(8)), child: Text(statusPill, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w500, color: color))), const SizedBox(width: 4), Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.outline.withValues(alpha: 0.55))]) : (NeuStyle.enabled || isModernCard || Pref.iosStyleUi ? Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.outline.withValues(alpha: 0.55)) : null),
       ); return NeuStyle.enabled ? Container(margin: const EdgeInsets.only(bottom: 10), decoration: NeuStyle.raised(isDark: isDark, radius: 16), clipBehavior: Clip.antiAlias, child: tile) : tile;
     }
 
@@ -339,6 +340,7 @@ class _SettingPageState extends State<SettingPage> {
       return buildTile(
         icon: item.icon,
         title: title,
+                statusPill: Pref.modernCardUi && !NeuStyle.enabled && type == SettingType.styleSetting ? (NeuStyle.enabled ? '新拟态风' : (Pref.modernCardUi ? '现代轻卡片' : '原版 MD3')) : null,
         subtitle: item.subtitle, iconColor: _badgeColor(item.type),
         selected: !_isPortrait && _type == type,
         onTap: () => _toPage(type),
@@ -377,10 +379,9 @@ class _SettingPageState extends State<SettingPage> {
         ),
       );
     }
-    Widget buildBentoCard(SettingType type, String title) { final item = itemOf(type); final color = _badgeColor(type); final isDark = theme.brightness == Brightness.dark; return Container(decoration: BoxDecoration(color: isDark ? theme.colorScheme.surfaceContainerHigh : Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: theme.dividerColor, width: 0.5)), clipBehavior: Clip.antiAlias, child: InkWell(onTap: () => _toPage(type), child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.14), shape: BoxShape.circle), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: item.icon))), const SizedBox(height: 10), Text(title, style: titleStyle, maxLines: 1, overflow: TextOverflow.ellipsis)])))); }
-    return ListView(
+ return ListView(
       padding: EdgeInsets.only(bottom: padding.bottom + 100),
-      children: [ if (Pref.modernCardUi && !NeuStyle.enabled) Padding(padding: const EdgeInsets.fromLTRB(14, 8, 14, 14), child: Row(children: [Expanded(child: buildBentoCard(SettingType.styleSetting, '外观与界面')), const SizedBox(width: 10), Expanded(child: buildBentoCard(SettingType.playSetting, '播放控制'))])),
+      children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
           child:NeuStyle.enabled ? _buildSearchItem(theme) :  Container(
