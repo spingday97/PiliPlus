@@ -303,30 +303,30 @@ class MyApp extends StatelessWidget {
     if (Pref.iosStyleUi) {
       light = light.copyWith(
         splashFactory: NoSplash.splashFactory, highlightColor: const Color(0x0D000000),
-        colorScheme: light.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF007AFF) : null, surface: const Color(0xFFE9EEF4), surfaceContainerLowest: const Color(0xFFE9EEF4), surfaceContainerLow: const Color(0xFFE9EEF4), surfaceContainer: const Color(0xFFDDE3EC)),
-    scaffoldBackgroundColor: const Color(0xFFE9EEF4), listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
+        colorScheme: light.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF007AFF) : null, surface: const Color(0xFFE4EAF1), surfaceContainerLowest: const Color(0xFFE4EAF1), surfaceContainerLow: const Color(0xFFE4EAF1), surfaceContainer: const Color(0xFFD8E0EA)),
+    scaffoldBackgroundColor: const Color(0xFFE4EAF1), listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
        cardTheme: CardThemeData(
-          color: const Color(0xFFE9EEF4),
+          color: const Color(0xFFE4EAF1),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
              
           ),
         ), 
-        appBarTheme: light.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: const Color(0xFFE9EEF4)),
+        appBarTheme: light.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: const Color(0xFFE4EAF1)),
         dividerTheme: const DividerThemeData(color: Color(0x1A000000), thickness: 0.5, space: 0.5),
       );
       dark = dark.copyWith(
-      splashFactory: NoSplash.splashFactory, highlightColor: const Color(0x14FFFFFF), colorScheme: dark.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF0A84FF) : null, surface: const Color(0xFF1E222A), surfaceContainerLowest: const Color(0xFF1E222A), surfaceContainerLow: const Color(0xFF1E222A), surfaceContainer: const Color(0xFF171A21)), scaffoldBackgroundColor: const Color(0xFF1E222A), listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
+      splashFactory: NoSplash.splashFactory, highlightColor: const Color(0x14FFFFFF), colorScheme: dark.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF0A84FF) : null, surface: const Color(0xFF1D2129), surfaceContainerLowest: const Color(0xFF1D2129), surfaceContainerLow: const Color(0xFF1D2129), surfaceContainer: const Color(0xFF151820)), scaffoldBackgroundColor: const Color(0xFF1D2129), listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
         cardTheme: CardThemeData(
-          color: const Color(0xFF1E222A),
+          color: const Color(0xFF1D2129),
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18),
              
           ),
         ), 
-        appBarTheme: dark.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: const Color(0xFF1E222A)),
+        appBarTheme: dark.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: const Color(0xFF1D2129)),
         dividerTheme: const DividerThemeData(color: Color(0x1FFFFFFF), thickness: 0.5, space: 0.5),
       );
     } else if (Pref.modernCardUi || Pref.colorPreset > 0) {
