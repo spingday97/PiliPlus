@@ -7,6 +7,7 @@ import 'package:PiliPlus/pages/dynamics/widgets/author_panel.dart';
 import 'package:PiliPlus/pages/dynamics/widgets/dyn_content.dart';
 import 'package:PiliPlus/pages/dynamics/widgets/interaction.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:material_ui/material_ui.dart';
@@ -123,7 +124,7 @@ class DynamicPanel extends StatelessWidget {
     );
     if (isSave || (isDetail && !isDetailPortraitW)) {
       return child;
-    }
+    } if (NeuStyle.enabled && !isDetail) { return Padding(padding: const EdgeInsets.fromLTRB(12, 6, 12, 6), child: Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 18, blur: 10, offset: 4), clipBehavior: Clip.antiAlias, child: child)); }
     return DecoratedBox(
       decoration: BoxDecoration(
         border: Border(
