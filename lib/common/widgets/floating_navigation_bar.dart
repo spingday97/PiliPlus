@@ -4,6 +4,7 @@
 
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:material_ui/material_ui.dart';
 
 const double _kMaxLabelTextScaleFactor = 1.3;
@@ -103,7 +104,7 @@ class FloatingNavigationBar extends StatelessWidget {
         height: _kNavigationHeight,
         width: totalWidth,
         child: DecoratedBox(
-          decoration: ShapeDecoration(
+          decoration: Pref.iosStyleUi ? NeuStyle.raised(isDark: colors.isDark, radius: _kNavigationHeight / 2, blur: 14, offset: 5) : ShapeDecoration(
             color: Pref.iosStyleUi ? (colors.isDark ? const Color(0xFF1C1C1E).withValues(alpha: 0.90) : Colors.white.withValues(alpha: 0.90)) : baseBg.withValues(alpha: 0.94),
             shadows: [
               BoxShadow(
@@ -131,10 +132,7 @@ class FloatingNavigationBar extends StatelessWidget {
                   bottom: 0,
                   width: itemWidth,
                   child: DecoratedBox(
-                    decoration: ShapeDecoration(
-                      shape: indicatorShape ?? _kNavigationShape,
-                      color: effectiveIndicatorColor,
-                    ),
+                    decoration: Pref.iosStyleUi ? NeuStyle.inset(isDark: colors.isDark, radius: _kIndicatorHeight / 2) : ShapeDecoration(shape: indicatorShape ?? _kNavigationShape, color: effectiveIndicatorColor),
                   ),
                 ),
                 Row(
