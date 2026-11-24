@@ -182,7 +182,7 @@ class _SettingPageState extends State<SettingPage> {
               (item) => ListTile(
                 tileColor: _getTileColor(theme, item.type),
                 onTap: () => _toPage(item.type),
-                leading: item.icon,
+                leading: Container(width: 36, height: 36, decoration: BoxDecoration(color: theme.colorScheme.primaryContainer.withValues(alpha: 0.55), shape: BoxShape.circle), child: Center(child: item.icon)),
                 title: Text(item.type.title, style: titleStyle),
                 subtitle: item.subtitle == null
                     ? null
@@ -191,14 +191,14 @@ class _SettingPageState extends State<SettingPage> {
             ),
         ListTile(
           onTap: () => LoginPageController.switchAccountDialog(context),
-          leading: const Icon(Icons.switch_account_outlined),
+          leading: Container(width: 36, height: 36, decoration: BoxDecoration(color: theme.colorScheme.primaryContainer.withValues(alpha: 0.55), shape: BoxShape.circle), child: Center(child: const Icon(Icons.switch_account_outlined))),
           title: Text('切换账号', style: titleStyle),
         ),
         Obx(
           () => _noAccount.value
               ? const SizedBox.shrink()
               : ListTile(
-                  leading: const Icon(Icons.logout_outlined),
+                  leading: Container(width: 36, height: 36, decoration: BoxDecoration(color: theme.colorScheme.primaryContainer.withValues(alpha: 0.55), shape: BoxShape.circle), child: Center(child: const Icon(Icons.logout_outlined))),
                   onTap: () => _logoutDialog(context),
                   title: Text('退出登录', style: titleStyle),
                 ),
@@ -206,7 +206,7 @@ class _SettingPageState extends State<SettingPage> {
         ListTile(
           tileColor: _getTileColor(theme, _items.last.type),
           onTap: () => _toPage(_items.last.type),
-          leading: _items.last.icon,
+          leading: Container(width: 36, height: 36, decoration: BoxDecoration(color: theme.colorScheme.primaryContainer.withValues(alpha: 0.55), shape: BoxShape.circle), child: Center(child: _items.last.icon)),
           title: Text(_items.last.type.title, style: titleStyle),
         ),
       ],
@@ -311,12 +311,12 @@ class _SettingPageState extends State<SettingPage> {
       Color? iconColor,
       bool selected = false,
     }) {
-      final color = iconColor ?? theme.colorScheme.primary;
-      return ListTile(
+      final color = iconColor ?? theme.colorScheme.primary; final isDark = theme.brightness == Brightness.dark; final isModernCard = Pref.modernCardUi && !NeuStyle.enabled;
+      final tile = ListTile(
         selected: selected,
         tileColor: selected ? theme.colorScheme.onInverseSurface : null,
         onTap: onTap,
-        leading: Pref.iosStyleUi ? Container(
+        leading: NeuStyle.enabled ? Container(width: 36, height: 36, decoration: NeuStyle.raised(isDark: isDark, radius: 18, blur: 6, offset: 2.5), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : isModernCard ? Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.14), shape: BoxShape.circle), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : : Pref.iosStyleUi ? Container(
           width: 28,
           height: 28,
           decoration: BoxDecoration(
@@ -330,8 +330,8 @@ class _SettingPageState extends State<SettingPage> {
         ) : icon,
         title: Text(title, style: titleStyle),
         subtitle: subtitle == null ? null : Text(subtitle, style: subTitleStyle),
-        trailing:Pref.iosStyleUi ?  Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.outline.withValues(alpha: 0.55)) : null,
-      );
+        trailing: NeuStyle.enabled || isModernCard || Pref.iosStyleUi ?  Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.outline.withValues(alpha: 0.55)) : null,
+      ); return NeuStyle.enabled ? Container(margin: const EdgeInsets.only(bottom: 10), decoration: NeuStyle.raised(isDark: isDark, radius: 16), clipBehavior: Clip.antiAlias, child: tile) : tile;
     }
 
     Widget buildSettingTile(SettingType type, String title) {
@@ -345,7 +345,7 @@ class _SettingPageState extends State<SettingPage> {
       );
     }
 
-    Widget buildGroup(String title, List<Widget> children) {
+    Widget buildGroup(String title, List<Widget> children) { final isDark = theme.brightness == Brightness.dark; final isModernCard = Pref.modernCardUi && !NeuStyle.enabled;
       return Padding(
         padding: const EdgeInsets.fromLTRB(14, 0, 14, 14),
         child: Column(
@@ -361,10 +361,10 @@ class _SettingPageState extends State<SettingPage> {
                 ),
               ),
             ),
-            Container(
-              decoration: NeuStyle.enabled ? NeuStyle.raised(isDark: theme.brightness == Brightness.dark, radius: 18, blur: 12, offset: 5) : BoxDecoration(
-                color: theme.cardTheme.color ?? theme.colorScheme.surface,
-                borderRadius: BorderRadius.circular(14),
+           NeuStyle.enabled ? Column(children: children) :  Container(
+              decoration:  BoxDecoration(
+                color: isModernCard ? (isDark ? theme.colorScheme.surfaceContainerHigh : Colors.white) : (theme.cardTheme.color ?? theme.colorScheme.surface),
+                borderRadius: BorderRadius.circular(isModernCard ? 16 : 14),
                 border: Border.all(
                   color: theme.dividerColor,
                   width: 0.5,
@@ -377,13 +377,13 @@ class _SettingPageState extends State<SettingPage> {
         ),
       );
     }
-
+    Widget buildBentoCard(SettingType type, String title) { final item = itemOf(type); final color = _badgeColor(type); final isDark = theme.brightness == Brightness.dark; return Container(decoration: BoxDecoration(color: isDark ? theme.colorScheme.surfaceContainerHigh : Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: theme.dividerColor, width: 0.5)), clipBehavior: Clip.antiAlias, child: InkWell(onTap: () => _toPage(type), child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.14), shape: BoxShape.circle), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: item.icon))), const SizedBox(height: 10), Text(title, style: titleStyle, maxLines: 1, overflow: TextOverflow.ellipsis)])))); }
     return ListView(
       padding: EdgeInsets.only(bottom: padding.bottom + 100),
-      children: [
+      children: [ if (Pref.modernCardUi && !NeuStyle.enabled) Padding(padding: const EdgeInsets.fromLTRB(14, 8, 14, 14), child: Row(children: [Expanded(child: buildBentoCard(SettingType.styleSetting, '外观与界面')), const SizedBox(width: 10), Expanded(child: buildBentoCard(SettingType.playSetting, '播放控制'))])),
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 8, 14, 14),
-          child: Container(
+          child:NeuStyle.enabled ? _buildSearchItem(theme) :  Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
@@ -439,9 +439,8 @@ class _SettingPageState extends State<SettingPage> {
       right: 16,
       bottom: 8,
     ),
-    child: Material(
-      color: theme.colorScheme.onInverseSurface,
-      borderRadius: const BorderRadius.all(Radius.circular(50)),
+    child:Container(decoration: NeuStyle.enabled ? NeuStyle.inset(isDark: theme.brightness == Brightness.dark, radius: 14) : BoxDecoration(color: theme.colorScheme.onInverseSurface, borderRadius: const BorderRadius.all(Radius.circular(50))), clipBehavior: Clip.antiAlias, child: Material(
+ type: MaterialType.transparency,
       child: InkWell(
         onTap: () => Get.toNamed('/settingsSearch'),
         borderRadius: const BorderRadius.all(Radius.circular(50)),
@@ -466,6 +465,6 @@ class _SettingPageState extends State<SettingPage> {
           ),
         ),
       ),
-    ),
+    ),),
   );
 }
