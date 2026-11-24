@@ -1,5 +1,6 @@
 import 'package:PiliPlus/models/dynamics/result.dart';
 import 'package:PiliPlus/pages/dynamics_repost/view.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/num_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/request_utils.dart';
@@ -27,11 +28,12 @@ class ActionPanel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       foregroundColor: outline,
     );
+    Widget wrapNeu(Widget child) => NeuStyle.enabled ? Container(margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), padding: const EdgeInsets.symmetric(vertical: 4), decoration: NeuStyle.raised(isDark: theme.brightness == Brightness.dark, radius: 14, blur: 6, offset: 2.5), child: child) : child;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Expanded(
-          child: Builder(
+          child:wrapNeu( Builder(
             builder: (context) {
               return TextButton.icon(
                 onPressed: () => showModalBottomSheet(
@@ -65,10 +67,10 @@ class ActionPanel extends StatelessWidget {
                 ),
               );
             },
-          ),
+          )),
         ),
         Expanded(
-          child: TextButton.icon(
+          child:wrapNeu( TextButton.icon(
             onPressed: () => PageUtils.pushDynDetail(
               item,
               isPush: true,
@@ -84,10 +86,10 @@ class ActionPanel extends StatelessWidget {
             label: Text(
               comment.count != null ? NumUtils.numFormat(comment.count) : '评论',
             ),
-          ),
+          )),
         ),
         Expanded(
-          child: Builder(
+          child:wrapNeu( Builder(
             builder: (context) {
               final IconData icon;
               final Color color;
@@ -131,7 +133,7 @@ class ActionPanel extends StatelessWidget {
                 ),
               );
             },
-          ),
+          )),
         ),
       ],
     );
