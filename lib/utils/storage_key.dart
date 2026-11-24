@@ -251,7 +251,7 @@ abstract final class SettingBoxKey {
       barHideType = 'barHideType',
       tabBarSort = 'tabBarSort',
       dynamicsTabSort = 'dynamicsTabSort',
-      modernCardUi = 'modernCardUi',
+      modernCardUi = 'modernCardUi', iosStyleUi = 'iosStyleUi',
 colorPreset = 'colorPreset',
 appIconAlias = 'appIconAlias',
       dynamicBadgeMode = 'dynamicBadgeMode',
