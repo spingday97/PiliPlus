@@ -168,7 +168,7 @@ class _SettingPageState extends State<SettingPage> {
     TextStyle subTitleStyle = theme.textTheme.labelMedium!.copyWith(
       color: theme.colorScheme.outline,
     );
-    if (Pref.modernCardUi) {
+    if (Pref.iosStyleUi || Pref.modernCardUi) {
       return _buildModernList(theme, padding, titleStyle, subTitleStyle);
     }
     return ListView(
@@ -300,7 +300,7 @@ class _SettingPageState extends State<SettingPage> {
     TextStyle subTitleStyle,
   ) {
     _SettingsModel itemOf(SettingType type) =>
-        _items.firstWhere((e) => e.type == type); Color _badgeColor(SettingType type) => switch (type) { SettingType.styleSetting => const Color(0xFFFF2D55), SettingType.videoSetting => const Color(0xFF007AFF), SettingType.playSetting => const Color(0xFFAF52DE), SettingType.dmSetting => const Color(0xFFFF9500), SettingType.recommendSetting => const Color(0xFF34C759), SettingType.replySetting => const Color(0xFF30B0C7), SettingType.dynSetting => const Color(0xFF5856D6), SettingType.privacySetting => const Color(0xFFFF3B30), SettingType.extraSetting => const Color(0xFFFFCC00), SettingType.about => const Color(0xFF8E8E93) };
+        _items.firstWhere((e) => e.type == type); Color _badgeColor(SettingType type) => switch (type) { SettingType.styleSetting => const Color(0xFFFF2D55), SettingType.videoSetting => const Color(0xFF007AFF), SettingType.playSetting => const Color(0xFFAF52DE), SettingType.dmSetting => const Color(0xFFFF9500), SettingType.recommendSetting => const Color(0xFF34C759), SettingType.replySetting => const Color(0xFF30B0C7), SettingType.dynSetting => const Color(0xFF5856D6), SettingType.privacySetting => const Color(0xFFFF3B30), SettingType.extraSetting => const Color(0xFFFFCC00), SettingType.about => const Color(0xFF8E8E93) , _ => const Color(0xFF8E8E93),};
 
     Widget buildTile({
       required Widget icon,
@@ -315,7 +315,7 @@ class _SettingPageState extends State<SettingPage> {
         selected: selected,
         tileColor: selected ? theme.colorScheme.onInverseSurface : null,
         onTap: onTap,
-        leading: Container(
+        leading: Pref.iosStyleUi ? Container(
           width: 28,
           height: 28,
           decoration: BoxDecoration(
@@ -326,10 +326,10 @@ class _SettingPageState extends State<SettingPage> {
             data: const IconThemeData(color: Colors.white, size: 17),
             child: icon,
           ),
-        ),
+        ) : icon,
         title: Text(title, style: titleStyle),
         subtitle: subtitle == null ? null : Text(subtitle, style: subTitleStyle),
-        trailing: Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.outline.withValues(alpha: 0.55)),
+        trailing:Pref.iosStyleUi ?  Icon(Icons.chevron_right_rounded, size: 20, color: theme.colorScheme.outline.withValues(alpha: 0.55)) : null,
       );
     }
 
