@@ -316,7 +316,7 @@ class _SettingPageState extends State<SettingPage> {
         selected: selected,
         tileColor: selected ? theme.colorScheme.onInverseSurface : null,
         onTap: onTap,
-        leading: NeuStyle.enabled ? Container(width: 36, height: 36, decoration: NeuStyle.raised(isDark: isDark, radius: 18, blur: 6, offset: 2.5), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : isModernCard ? Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.14), shape: BoxShape.circle), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : : Pref.iosStyleUi ? Container(
+        leading: NeuStyle.enabled ? Container(width: 36, height: 36, decoration: NeuStyle.raised(isDark: isDark, radius: 18, blur: 6, offset: 2.5), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : isModernCard ? Container(width: 36, height: 36, decoration: BoxDecoration(color: color.withValues(alpha: 0.14), shape: BoxShape.circle), child: Center(child: IconTheme(data: IconThemeData(color: color, size: 19), child: icon))) : Pref.iosStyleUi ? Container(
           width: 28,
           height: 28,
           decoration: BoxDecoration(
