@@ -1,5 +1,7 @@
 import 'package:PiliPlus/common/widgets/custom_arc.dart';
 import 'package:PiliPlus/utils/extension/theme_ext.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -63,7 +65,20 @@ class ActionItem extends StatelessWidget {
     } else {
       child = SizedBox.square(dimension: 28, child: child);
     }
-
+    if (NeuStyle.enabled) {
+      final isDark = theme.brightness == Brightness.dark;
+      child = Container(
+        width: 34, height: 34,
+        decoration: selectStatus ? NeuStyle.inset(isDark: isDark, radius: 10) : NeuStyle.raised(isDark: isDark, radius: 10, blur: 6, offset: 2.5),
+        child: Center(child: child),
+        );
+      } else if (Pref.modernCardUi && selectStatus) {
+      child = Container(
+        width: 32, height: 32,
+        decoration: BoxDecoration(color: primary.withValues(alpha: 0.14), shape: BoxShape.circle),
+        child: Center(child: child),
+        );
+    }
     child = Material(
       type: .transparency,
       child: InkWell(
