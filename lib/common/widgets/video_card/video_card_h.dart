@@ -9,6 +9,7 @@ import 'package:PiliPlus/http/search.dart';
 import 'package:PiliPlus/models/horizontal_video_model.dart';
 import 'package:PiliPlus/models_new/video/video_detail/dimension.dart';
 import 'package:PiliPlus/utils/date_utils.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
@@ -37,7 +38,7 @@ class VideoCardH extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Material(
+    final child = Material(
       type: .transparency,
       child: Stack(
         clipBehavior: .none,
@@ -136,7 +137,7 @@ class VideoCardH extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ) if (NeuStyle.enabled) { return Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5), child: Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 16, blur: 10, offset: 4), clipBehavior: Clip.antiAlias, child: child)); } return child;;
   }
 
   Widget content(ThemeData theme) {
