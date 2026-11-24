@@ -303,33 +303,30 @@ class MyApp extends StatelessWidget {
     if (Pref.iosStyleUi) {
       light = light.copyWith(
         splashFactory: NoSplash.splashFactory, highlightColor: const Color(0x0D000000),
-        colorScheme: light.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF007AFF) : null, surface: Colors.white, surfaceContainerLowest: const Color(0xFFF2F2F7), surfaceContainerLow: Colors.white, surfaceContainer: const Color(0xFFE5E5EA)),
-    scaffoldBackgroundColor: const Color(0xFFF2F2F7), listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
+        colorScheme: light.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF007AFF) : null, surface: const Color(0xFFE9EEF4), surfaceContainerLowest: const Color(0xFFE9EEF4), surfaceContainerLow: const Color(0xFFE9EEF4), surfaceContainer: const Color(0xFFDDE3EC)),
+    scaffoldBackgroundColor: const Color(0xFFE9EEF4), listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
        cardTheme: CardThemeData(
-          color: Colors.white,
+          color: const Color(0xFFE9EEF4),
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-            side: const BorderSide(color: Color(0x14000000), width: 0.5),
+            borderRadius: BorderRadius.circular(18),
+             
           ),
         ), 
-        appBarTheme: light.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: switch (Pref.colorPreset) { 2 => const Color(0xFFFAF6F7), 3 => const Color(0xFFF4F7F5), 5 => const Color(0xFFF6F5FC), 6 => const Color(0xFFFAF7F2), 7 => const Color(0xFFF4F7FA), 8 => const Color(0xFFFAF5F6), _ => const Color(0xFFF2F2F7) }),
+        appBarTheme: light.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: const Color(0xFFE9EEF4)),
         dividerTheme: const DividerThemeData(color: Color(0x1A000000), thickness: 0.5, space: 0.5),
       );
       dark = dark.copyWith(
-      splashFactory: NoSplash.splashFactory, highlightColor: const Color(0x14FFFFFF), colorScheme: dark.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF0A84FF) : null, surface: const Color(0xFF1C1C1E), surfaceContainerLowest: Colors.black, surfaceContainerLow: const Color(0xFF1C1C1E), surfaceContainer: const Color(0xFF2C2C2E)), scaffoldBackgroundColor: Colors.black, listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
+      splashFactory: NoSplash.splashFactory, highlightColor: const Color(0x14FFFFFF), colorScheme: dark.colorScheme.copyWith(primary: Pref.colorPreset == 0 ? const Color(0xFF0A84FF) : null, surface: const Color(0xFF1E222A), surfaceContainerLowest: const Color(0xFF1E222A), surfaceContainerLow: const Color(0xFF1E222A), surfaceContainer: const Color(0xFF171A21)), scaffoldBackgroundColor: const Color(0xFF1E222A), listTileTheme: const ListTileThemeData(tileColor: Colors.transparent),
         cardTheme: CardThemeData(
-          color: switch (Pref.colorPreset) { 4 => const Color(0xFF161920), 9 => const Color(0xFF1C212B), _ => const Color(0xFF1C1C1E) },
+          color: const Color(0xFF1E222A),
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
-            side: const BorderSide(
-              color: Color(0x1FFFFFFF),
-              width: 0.5,
-            ),
+            borderRadius: BorderRadius.circular(18),
+             
           ),
         ), 
-        appBarTheme: dark.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: switch (Pref.colorPreset) { 4 => Colors.black, 9 => const Color(0xFF12151C), _ => const Color(0xFF000000) }),
+        appBarTheme: dark.appBarTheme.copyWith(scrolledUnderElevation: 0, surfaceTintColor: Colors.transparent, centerTitle: true, backgroundColor: const Color(0xFF1E222A)),
         dividerTheme: const DividerThemeData(color: Color(0x1FFFFFFF), thickness: 0.5, space: 0.5),
       );
     } else if (Pref.modernCardUi || Pref.colorPreset > 0) {
