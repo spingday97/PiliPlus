@@ -137,7 +137,7 @@ class VideoCardH extends StatelessWidget {
           ),
         ],
       ),
-    ) if (NeuStyle.enabled) { return Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5), child: Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 16, blur: 10, offset: 4), clipBehavior: Clip.antiAlias, child: child)); } return child;;
+    ); if (NeuStyle.enabled) { return Padding(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5), child: Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 16, blur: 10, offset: 4), clipBehavior: Clip.antiAlias, child: child)); } return child;;
   }
 
   Widget content(ThemeData theme) {
