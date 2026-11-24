@@ -1,4 +1,6 @@
 import 'package:PiliPlus/utils/storage_pref.dart';
+import 'package:PiliPlus/pages/video/widgets/audio_extract_sheet.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/common/assets.dart';
 import 'package:PiliPlus/common/constants.dart';
 import 'package:PiliPlus/common/style.dart';
@@ -476,7 +478,7 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
     UgcIntroController introController,
     VideoStat? stat,
   ) {
-    return SizedBox(
+    final grid = SizedBox(
       height: 48,
       child: Row(
         crossAxisAlignment: .start,
@@ -537,7 +539,13 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
             text: '缓存',
             semanticsLabel: '缓存',
           ),
-          Obx(
+         ActionItem(
+              icon: const Icon(Icons.audiotrack_rounded),
+             onTap: () => AudioExtractSheet.show(context, videoDetailCtr),
+             text: '提取音频',
+             semanticsLabel: '提取音频',
+          ),
+            Obx(
             () => ActionItem(
               icon: const Icon(FontAwesomeIcons.clock),
               selectIcon: const Icon(FontAwesomeIcons.solidClock),
@@ -558,7 +566,16 @@ class _UgcIntroPanelState extends State<UgcIntroPanel> {
         ],
       ),
     );
-  }
+      if (NeuStyle.enabled) {
+          return Container(
+             margin: const EdgeInsets.symmetric(vertical: 6),
+             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+             decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 16, blur: 10, offset: 4),
+              child: grid,
+      );
+      }
+      return grid;
+      }
 
   static final RegExp urlRegExp = RegExp(
     Constants.urlRegex.pattern + r'|av\d+|bv[a-z\d]{10}|(?:\d+[:：])?\d+[:：]\d+',
