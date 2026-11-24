@@ -147,7 +147,7 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
             ),
           ),
           const SizedBox(width: 6),
-          msgBadge(_mainController),
+          NeuStyle.enabled ? Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 20, blur: 8, offset: 3), child: msgBadge(_mainController)) : msgBadge(_mainController),
           const SizedBox(width: 8),
           userAvatar(
             colorScheme: _colorScheme,
@@ -159,9 +159,9 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
       children: [
         searchBar(),
         const SizedBox(width: 4),
-        msgBadge(_mainController),
+        NeuStyle.enabled ? Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 20, blur: 8, offset: 3), child: msgBadge(_mainController)) : msgBadge(_mainController),
         const SizedBox(width: 8),
-        userAvatar(colorScheme: _colorScheme, mainController: _mainController),
+        NeuStyle.enabled ? Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 20, blur: 8, offset: 3), child: userAvatar(colorScheme: _colorScheme, mainController: _mainController)) : userAvatar(colorScheme: _colorScheme, mainController: _mainController),
       ],
     );
    if (Pref.modernCardUi) { return Container(height: Style.topBarHeight, padding: padding, child: child); }
@@ -206,13 +206,13 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
   }
 
   Widget searchBar() {
-    const borderRadius = BorderRadius.all(Radius.circular(25));
+    final isNeu = NeuStyle.enabled; final isDark = Theme.of(context).brightness == Brightness.dark; final borderRadius = BorderRadius.all(Radius.circular(isNeu ? 20 : 25));
     return Expanded(
-      child: SizedBox(
+      child: Container(decoration: isNeu ? NeuStyle.inset(isDark: isDark, radius: 20) : null,
         height: 44,
         child: Material(
           borderRadius: borderRadius,
-          color: _colorScheme.onSecondaryContainer.withValues(alpha: 0.05),
+          color: isNeu ? Colors.transparent : _colorScheme.onSecondaryContainer.withValues(alpha: 0.05),
           child: InkWell(
             borderRadius: borderRadius,
             splashColor: _colorScheme.primaryContainer.withValues(
