@@ -10,6 +10,7 @@ import 'package:PiliPlus/pages/setting/common_setting.dart';
 import 'package:PiliPlus/pages/setting/widgets/multi_select_dialog.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/accounts/account.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -361,7 +362,7 @@ class _SettingPageState extends State<SettingPage> {
               ),
             ),
             Container(
-              decoration: BoxDecoration(
+              decoration: NeuStyle.enabled ? NeuStyle.raised(isDark: theme.brightness == Brightness.dark, radius: 18, blur: 12, offset: 5) : BoxDecoration(
                 color: theme.cardTheme.color ?? theme.colorScheme.surface,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
