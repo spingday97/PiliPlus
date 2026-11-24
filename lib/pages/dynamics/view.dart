@@ -262,7 +262,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
     super.build(context);
     final colorScheme = ColorScheme.of(context);
     final isModern = Pref.modernCardUi;
-
+    final isIos = Pref.iosStyleUi;
     Widget? drawer;
     Widget? endDrawer;
 
@@ -319,7 +319,7 @@ class _DynamicsPageState extends CommonPageState<DynamicsPage>
       }
     }
 
-    final tabBar = TabBar(
+    final tabBar = isIos ? Container(margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4), padding: const EdgeInsets.all(3), decoration: BoxDecoration(color: colorScheme.surfaceContainer, borderRadius: BorderRadius.circular(12)), child: TabBar(dividerHeight: 0, isScrollable: true, tabAlignment: .start, dividerColor: Colors.transparent, indicatorSize: TabBarIndicatorSize.tab, indicatorWeight: 0, indicator: BoxDecoration(color: colorScheme.surface, borderRadius: BorderRadius.circular(10), boxShadow: const [BoxShadow(color: Color(0x14000000), blurRadius: 4, offset: Offset(0, 1))]), labelColor: colorScheme.onSurface, unselectedLabelColor: colorScheme.outline, controller: _dynamicsController.tabController, labelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600), unselectedLabelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.normal), tabs: _dynamicsController.tabs.map((e) => Tab(text: e.label)).toList(), onTap: (index) { if (!_dynamicsController.tabController.indexIsChanging) { _dynamicsController.animateToTop(); } })) : TabBar(
       dividerHeight: 0,
       isScrollable: true,
       tabAlignment: .start,
