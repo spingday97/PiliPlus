@@ -13,6 +13,7 @@ import 'package:PiliPlus/utils/date_utils.dart';
 import 'package:PiliPlus/utils/duration_utils.dart';
 import 'package:PiliPlus/utils/extension/dimension_ext.dart';
 import 'package:PiliPlus/utils/id_utils.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/platform_utils.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -86,11 +87,7 @@ class VideoCardV extends StatelessWidget {
       cover: videoItem.cover,
       bvid: videoItem.bvid,
     );
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        Card(
-          child: InkWell(
+  final inkWell = InkWell(
             onTap: onPushDetail,
             onLongPress: onLongPress,
             onSecondaryTap: PlatformUtils.isMobile ? null : onLongPress,
@@ -131,8 +128,9 @@ class VideoCardV extends StatelessWidget {
                 content(context),
               ],
             ),
-          ),
-        ),
+       );
+          return Stack(clipBehavior: Clip.none, children: [
+            NeuStyle.enabled ? Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 18, blur: 10, offset: 4), clipBehavior: Clip.antiAlias, child: inkWell) : Card(child: inkWell),
         if (videoItem.goto == 'av')
           Positioned(
             right: -5,
