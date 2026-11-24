@@ -411,7 +411,7 @@ class HeaderControlState extends State<HeaderControl>
             dense: true,
             onTap: () {
               Get.back();
-             AudioExtractSheet.show(this.context, videoDetailCtr);
+             WidgetsBinding.instance.addPostFrameCallback((_) { if (this.context.mounted) AudioExtractSheet.show(this.context, videoDetailCtr); });
             },
             leading: const Icon(
               Icons.audiotrack_rounded,
