@@ -83,7 +83,7 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
     } else {
       tabBar = const SizedBox(height: 6);
     }
-    if ((Pref.modernCardUi || NeuStyle.enabled) && _homeController.hideTopBar) { final rawTabBar = tabBar; if (_mainController.barOffset case final barOffset?) { tabBar = Obx(() { final offset = barOffset.value.clamp(0.0, 46.0); return CustomHeightWidget(offset: Offset(0, -offset), height: (46.0 - offset).clamp(0.0, 46.0), child: rawTabBar); }); } else if (_homeController.showTopBar case final showTopBar?) { tabBar = Obx(() => AnimatedOpacity(opacity: showTopBar.value ? 1 : 0, duration: const Duration(milliseconds: 250), child: AnimatedContainer(duration: const Duration(milliseconds: 300), curve: Curves.easeInOutCubicEmphasized, height: showTopBar.value ? 46 : 0, child: rawTabBar))); } }
+      if ((Pref.modernCardUi || NeuStyle.enabled) && _homeController.hideTopBar) { final rawTabBar = tabBar; final barH = isIos ? 54.0 : 46.0; if (_mainController.barOffset case final barOffset?) { tabBar = Obx(() { final offset = barOffset.value.clamp(0.0, barH); return ClipRect(child: CustomHeightWidget(offset: Offset(0, -offset), height: (barH - offset).clamp(0.0, barH), child: rawTabBar)); }); } else if (_homeController.showTopBar case final showTopBar?) { tabBar = Obx(() => AnimatedOpacity(opacity: showTopBar.value ? 1 : 0, duration: const Duration(milliseconds: 250), child: ClipRect(child: AnimatedContainer(duration: const Duration(milliseconds: 300), curve: Curves.easeInOutCubicEmphasized, height: showTopBar.value ? barH : 0, child: rawTabBar)))); } }
     
     return Column(
       children: [
@@ -168,15 +168,15 @@ unselectedLabelColor: isModern ? _colorScheme.onSurfaceVariant : null,
       if (_mainController.barOffset case final barOffset?) {
         return Obx(
           () {
-            final offset = barOffset.value;
-            return CustomHeightWidget(
+            final offset = barOffset.value.clamp(0.0, Style.topBarHeight);
+           return ClipRect(child: CustomHeightWidget(
               offset: Offset(0, -offset),
-              height: Style.topBarHeight - offset,
+              height: (Style.topBarHeight - offset).clamp(0.0, Style.topBarHeight),
               child: Padding(
                 padding: padding,
                 child: child,
               ),
-            );
+            ));
           },
         );
       }
