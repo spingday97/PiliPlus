@@ -411,12 +411,7 @@ class HeaderControlState extends State<HeaderControl>
             dense: true,
             onTap: () {
               Get.back();
-              Future.delayed(const Duration(milliseconds: 80), () {
-                  final ctx = Get.context;
-                  if (ctx != null && ctx.mounted) {
-                      AudioExtractSheet.show(ctx, videoDetailCtr);
-                  }
-                  });
+             AudioExtractSheet.show(this.context, videoDetailCtr);
             },
             leading: const Icon(
               Icons.audiotrack_rounded,
