@@ -168,7 +168,7 @@ class _MediaPageState extends CommonPageState<MinePage>
                       hasCustomBg,
                     ),
                     _buildUserStatsRow(theme, secondary),
-if (Pref.modernCardUi)
+if (Pref.iosStyleUi || Pref.modernCardUi)
   _buildBentoGrid(theme)
 else
                     _buildActions(secondary),
@@ -226,12 +226,13 @@ else
     required VoidCallback onTap,
     bool isLarge = false,
   }) {
+    final theme = Theme.of(context); final isIos = Pref.iosStyleUi; final radius = BorderRadius.circular(isIos ? 14 : (isLarge ? 20 : 16)); 
     return Material(
       color: bgColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(isLarge ? 20 : 16), side: BorderSide(color: borderColor, width: 1)), clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(borderRadius: radius, side: BorderSide(color: isIos ? theme.dividerColor : borderColor, width: isIos ? 0.5 : 1)), clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(isLarge ? 20 : 16),
+        borderRadius: radius,
         child: Padding(
           padding: EdgeInsets.symmetric(
             horizontal: 16,
@@ -250,8 +251,8 @@ else
                     color: fgColor,
                   ),
                   overflow: TextOverflow.ellipsis,
-                ),
-              ),
+                ),),
+          if (isIos) Icon(Icons.chevron_right_rounded, size: 18, color: theme.colorScheme.outline.withValues(alpha: 0.55)),     //),
             ],
           ),
         ),
