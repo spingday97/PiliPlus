@@ -367,13 +367,10 @@ class _SettingPageState extends State<SettingPage> {
               decoration:  BoxDecoration(
                 color: isModernCard ? (isDark ? theme.colorScheme.surfaceContainerHigh : Colors.white) : (theme.cardTheme.color ?? theme.colorScheme.surface),
                 borderRadius: BorderRadius.circular(isModernCard ? 16 : 14),
-                border: Border.all(
-                  color: theme.dividerColor,
-                  width: 0.5,
-                ),
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: isDark ? 0.22 : 0.04), blurRadius: 10, offset: const Offset(0, 2))],
               ),
               clipBehavior: Clip.antiAlias,
-              child: Column(children: [for (int i = 0; i < children.length; i++) ...[if (i > 0) Divider(height: 0.5, thickness: 0.5, color: theme.dividerColor), children[i]]]),
+              child: Column(children: children),
             ),
           ],
         ),
