@@ -130,7 +130,7 @@ class VideoCardV extends StatelessWidget {
             ),
        );
           return Stack(clipBehavior: Clip.none, children: [
-            NeuStyle.enabled ? Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 18, blur: 10, offset: 4), clipBehavior: Clip.antiAlias, child: inkWell) : Card(child: inkWell),
+            NeuStyle.enabled ? Container(decoration: NeuStyle.raised(isDark: Theme.of(context).brightness == Brightness.dark, radius: 18, blur: 10, offset: 4), clipBehavior: Clip.antiAlias, child: Padding(padding: const EdgeInsets.all(6), child: inkWell)) : Card(child: inkWell),
         if (videoItem.goto == 'av')
           Positioned(
             right: -5,
