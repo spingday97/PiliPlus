@@ -1,4 +1,5 @@
 import 'package:PiliPlus/utils/storage_pref.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'dart:io' show Platform;
 import 'dart:math';
 
@@ -1319,7 +1320,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
 
     Widget tabBar() {
       final flag = !needIndicator || tabs.length == 1;
-      final isModern = Pref.modernCardUi && !flag;
+      final isModern = Pref.modernCardUi && !flag; final isNeu = NeuStyle.enabled; final isDark = Theme.of(context).brightness == Brightness.dark;
         return TabBar(
         padding: .zero,
         dividerHeight: 0,
@@ -1327,8 +1328,8 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
         dividerColor: Colors.transparent,
         indicatorSize: isModern ? TabBarIndicatorSize.tab : null,
             controller: videoDetailController.tabCtr,
-        indicatorPadding: isModern ? const .symmetric(vertical: 6, horizontal: 4) : .zero, indicator: flag ? const BoxDecoration() : isModern ? BoxDecoration(color: colorScheme.primary, borderRadius: .circular(18)) : null,
-        labelColor: flag ? colorScheme.onSurface : isModern ? colorScheme.onPrimary : null, unselectedLabelColor: isModern ? colorScheme.onSurfaceVariant : null,
+        indicatorPadding: isModern ? const .symmetric(vertical: 6, horizontal: 4) : .zero, indicator: flag ? const BoxDecoration() : isNeu ? NeuStyle.raised(isDark: isDark, radius: 10, blur: 6, offset: 2) : isModern ? BoxDecoration(color: colorScheme.primary, borderRadius: .circular(18)) : null,
+        labelColor: flag ? colorScheme.onSurface : isNeu ? colorScheme.primary : isModern ? colorScheme.onPrimary : null, unselectedLabelColor: isModern ? colorScheme.onSurfaceVariant : null,
         labelStyle:
             TabBarTheme.of(context).labelStyle?.copyWith(fontSize: 13) ??
             const TextStyle(fontSize: 13),
@@ -1395,7 +1396,7 @@ class _VideoDetailPageVState extends State<VideoDetailPageV>
                   alignment: .centerLeft,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(maxWidth: 96.0 * tabs.length),
-                    child: tabBar(),
+                    child: NeuStyle.enabled ? Container(margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), decoration: NeuStyle.inset(isDark: Theme.of(context).brightness == Brightness.dark, radius: 14), child: tabBar()) : tabBar(),
                   ),
                 ),
               ),
