@@ -5,17 +5,17 @@ abstract final class NeuStyle {
   static bool get enabled => Pref.iosStyleUi;
 
   static Color canvasColor(bool isDark) =>
-    isDark ? const Color(0xFF1E222A) : const Color(0xFFE9EEF4);
+    isDark ? const Color(0xFF1D2129) : const Color(0xFFE4EAF1);
 
   static Color grooveColor(bool isDark) =>
-      isDark ? const Color(0xFF171A21) : const Color(0xFFDDE3EC);
+      isDark ? const Color(0xFF151820) : const Color(0xFFD8E0EA);
 
   static BoxDecoration raised({
     required bool isDark,
     double radius = 16,
     Color? color,
-    double blur = 10,
-    double offset = 4,
+    double blur = 13,
+    double offset = 5.5,
   }) {
     return BoxDecoration(
       color: color ?? canvasColor(isDark),
@@ -23,15 +23,15 @@ abstract final class NeuStyle {
       boxShadow: [
         BoxShadow(
           color: isDark
-              ? const Color(0xFF2B313D)
-              : Colors.white.withValues(alpha: 0.90),
+              ? const Color(0xFF2D3442)
+              : Colors.white,
           offset: Offset(-offset, -offset),
           blurRadius: blur,
         ),
         BoxShadow(
           color: isDark
-              ? const Color(0xFF101318).withValues(alpha: 0.85)
-              : const Color(0xFFA3B1C6).withValues(alpha: 0.45),
+              ? const Color(0xFF0D0F14).withValues(alpha: 0.90)
+              : const Color(0xFF9AA8BE).withValues(alpha: 0.60),
           offset: Offset(offset, offset),
           blurRadius: blur,
         ),
