@@ -4,7 +4,7 @@ import 'package:PiliPlus/http/reply.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
 import 'package:PiliPlus/utils/num_utils.dart';
-import 'package:PiliPlus/common/widgets/neu_style.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
