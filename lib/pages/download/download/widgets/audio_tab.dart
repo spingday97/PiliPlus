@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:PiliPlus/utils/audio_extract_storage.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/storage_utils.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:flutter/material.dart';
@@ -19,13 +20,17 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
     with AutomaticKeepAliveClientMixin {
   Player? _player;
   StreamSubscription<bool>? _playingSub;
+  StreamSubscription<Duration>? _posSub;
+  StreamSubscription<Duration>? _durSub;
   StreamSubscription<bool>? _completedSub;
 
   List<ExtractedAudioItem> _items = const [];
   bool _loading = true;
   String? _playingPath;
   bool _isPlaying = false;
-
+  Duration _position = Duration.zero;
+  Duration _duration = Duration.zero;
+  
   @override
   bool get wantKeepAlive => true;
 
@@ -40,6 +45,8 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
   void dispose() {
     AudioExtractStorage.version.removeListener(_load);
     _playingSub?.cancel();
+   _posSub?.cancel();
+   _durSub?.cancel();
     _completedSub?.cancel();
     _player?.dispose();
     super.dispose();
@@ -50,6 +57,8 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
     _playingSub = p.stream.playing.listen((playing) {
       if (mounted) setState(() => _isPlaying = playing);
       });
+   _posSub = p.stream.position.listen((pos) { if (mounted) setState(() => _position = pos); });
+   _durSub = p.stream.duration.listen((dur) { if (mounted) setState(() => _duration = dur); });
     _completedSub = p.stream.completed.listen((done) {
       if (done && mounted) setState(() => _isPlaying = false);
       });
@@ -128,7 +137,7 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
       );
     }
 
-    return RefreshIndicator(
+    return Column(children: [Expanded(child: RefreshIndicator(
       onRefresh: _load,
       child: ListView.separated(
         padding: EdgeInsets.fromLTRB(
@@ -249,6 +258,7 @@ class _DownloadedAudioTabState extends State<DownloadedAudioTab>
           );
         },
       ),
-    );
+    )), if (_playingPath != null) Builder(builder: (context) { final currentItem = _items.where((e) => e.filePath == _playingPath).firstOrNull; final maxMs = _duration.inMilliseconds > 0 ? _duration.inMilliseconds.toDouble() : 1.0; final posMs = _position.inMilliseconds.toDouble().clamp(0.0, maxMs); return Container(margin: const EdgeInsets.fromLTRB(12, 4, 12, 8), padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8), decoration: NeuStyle.enabled ? NeuStyle.raised(isDark: theme.brightness == Brightness.dark) : BoxDecoration(color: colorScheme.surfaceContainerHigh, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 8, offset: const Offset(0, 2))]), child: Column(mainAxisSize: MainAxisSize.min, children: [Row(children: [IconButton(onPressed: () { if (currentItem != null) { _togglePlay(currentItem); } else { _player?.playOrPause(); } }, icon: Icon(_isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded)), Expanded(child: Text(currentItem?.title ?? '', maxLines: 1, overflow: TextOverflow.ellipsis, style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600))), Text('${_formatDur(_position)} / ${_formatDur(_duration)}', style: theme.textTheme.labelSmall?.copyWith(color: colorScheme.outline))]), Slider(value: posMs, max: maxMs, onChanged: (v) => _player?.seek(Duration(milliseconds: v.round())))])); }), ]);
   }
+  String _formatDur(Duration d) { final m = d.inMinutes.toString().padLeft(2, '0'); final s = d.inSeconds.remainder(60).toString().padLeft(2, '0'); return '$m:$s'; }
 }
