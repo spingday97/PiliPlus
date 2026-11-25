@@ -4,6 +4,8 @@ import 'package:PiliPlus/http/reply.dart';
 import 'package:PiliPlus/utils/accounts.dart';
 import 'package:PiliPlus/utils/feed_back.dart';
 import 'package:PiliPlus/utils/num_utils.dart';
+import 'package:PiliPlus/common/widgets/neu_style.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -98,7 +100,9 @@ class ZanButtonGrpc extends StatelessWidget {
     final isLike = action == $fixnum.Int64.ONE;
     final isDislike = action == $fixnum.Int64.TWO;
     final outline = theme.colorScheme.outline;
-    final primary = theme.colorScheme.primary;
+    final isDark = theme.brightness == Brightness.dark;
+final useModernIcons = Pref.modernCardUi || NeuStyle.enabled;
+      final primary = theme.colorScheme.primary;
     final ButtonStyle style = TextButton.styleFrom(
       padding: EdgeInsets.zero,
       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -137,16 +141,17 @@ class ZanButtonGrpc extends StatelessWidget {
                 : _toastNotLogin,
             child: Icon(
               isDislike
-                  ? FontAwesomeIcons.solidThumbsDown
-                  : FontAwesomeIcons.thumbsDown,
+                  ? useModernIcons ? Icons.thumb_down_rounded : FontAwesomeIcons.solidThumbsDown
+                  : useModernIcons ? Icons.thumb_down_outlined : FontAwesomeIcons.thumbsDown,
               size: 16,
               color: isDislike ? primary : outline,
               semanticLabel: isDislike ? '已踩' : '点踩',
             ),
           ),
         ),
-        SizedBox(
-          height: 32,
+          Container(
+decoration: isLike ? (NeuStyle.enabled ? NeuStyle.inset(isDark: isDark, radius: 16) : (Pref.modernCardUi ? BoxDecoration(color: primary.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(16)) : null)) : null,
+              height: 32,
           child: TextButton(
             style: style,
             onPressed: isLogin
@@ -157,8 +162,8 @@ class ZanButtonGrpc extends StatelessWidget {
               children: [
                 Icon(
                   isLike
-                      ? FontAwesomeIcons.solidThumbsUp
-                      : FontAwesomeIcons.thumbsUp,
+                      ? useModernIcons ? Icons.thumb_up_rounded : FontAwesomeIcons.solidThumbsUp
+                      : useModernIcons ? Icons.thumb_up_outlined : FontAwesomeIcons.thumbsUp,
                   size: 16,
                   color: isLike ? primary : outline,
                   semanticLabel: isLike ? '已赞' : '点赞',
