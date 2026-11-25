@@ -4,6 +4,7 @@ import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/num_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
 import 'package:PiliPlus/utils/request_utils.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:material_ui/material_ui.dart';
 
@@ -28,7 +29,9 @@ class ActionPanel extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15),
       foregroundColor: outline,
     );
-    Widget wrapNeu(Widget child) => NeuStyle.enabled ? Container(margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), padding: const EdgeInsets.symmetric(vertical: 4), decoration: NeuStyle.raised(isDark: theme.brightness == Brightness.dark, radius: 14, blur: 6, offset: 2.5), child: child) : child;
+    final isDark = theme.brightness == Brightness.dark;
+    final useModernIcons = Pref.modernCardUi || NeuStyle.enabled;
+    Widget wrapNeu(Widget child, {bool isLiked = false}) => NeuStyle.enabled ? Container(margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), padding: const EdgeInsets.symmetric(vertical: 4), decoration: isLiked ? NeuStyle.inset(isDark: isDark, radius: 14) : NeuStyle.raised(isDark: isDark, radius: 14, blur: 6, offset: 2.5), child: child) : (Pref.modernCardUi && isLiked ? Container(margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 4), padding: const EdgeInsets.symmetric(vertical: 4), decoration: BoxDecoration(color: primary.withValues(alpha: 0.12), borderRadius: BorderRadius.circular(14)), child: child) : child);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
@@ -54,7 +57,7 @@ class ActionPanel extends StatelessWidget {
                   ),
                 ),
                 icon: Icon(
-                  FontAwesomeIcons.shareFromSquare,
+                useModernIcons ? Icons.repeat_rounded :   FontAwesomeIcons.shareFromSquare,
                   size: 16,
                   color: outline,
                   semanticLabel: "转发",
@@ -77,7 +80,7 @@ class ActionPanel extends StatelessWidget {
               viewComment: true,
             ),
             icon: Icon(
-              FontAwesomeIcons.comment,
+           useModernIcons ? Icons.chat_bubble_outline_rounded :    FontAwesomeIcons.comment,
               size: 16,
               color: outline,
               semanticLabel: "评论",
@@ -89,17 +92,17 @@ class ActionPanel extends StatelessWidget {
           )),
         ),
         Expanded(
-          child:wrapNeu( Builder(
+          child:wrapNeu( isLiked: like.status == true, Builder(
             builder: (context) {
               final IconData icon;
               final Color color;
               final String label;
               if (like.status ?? false) {
-                icon = FontAwesomeIcons.solidThumbsUp;
+                icon = useModernIcons ? Icons.thumb_up_rounded : FontAwesomeIcons.solidThumbsUp;
                 color = primary;
                 label = '已赞';
               } else {
-                icon = FontAwesomeIcons.thumbsUp;
+                icon = useModernIcons ? Icons.thumb_up_outlined : FontAwesomeIcons.thumbsUp;
                 color = outline;
                 label = '点赞';
               }
