@@ -173,7 +173,7 @@ class LiveRoomController extends GetxController
       stream = playurl.stream;
       _initStreamIndex();
       await Future.wait([
-        ?initLiveUrl(
+        ?(
           streamIndex: streamIndex,
           formatIndex: formatIndex,
           codecIndex: codecIndex,
@@ -224,13 +224,14 @@ class LiveRoomController extends GetxController
     int streamIndex = 0,
     int formatIndex = 0,
     int codecIndex = 0,
-    int liveUrlIndex = 0,
+    int? liveUrlIndex,
   }) {
     this.streamIndex = streamIndex;
     this.formatIndex = formatIndex;
     this.codecIndex = codecIndex;
-    this.liveUrlIndex = liveUrlIndex;
-    GStorage.setting.put(SettingBoxKey.liveUrlIndex, liveUrlIndex);
+   var targetUrlIdx = liveUrlIndex ?? this.liveUrlIndex;
+      this.liveUrlIndex = targetUrlIdx;
+    GStorage.setting.put(SettingBoxKey.liveUrlIndex, targetUrlIdx);
       
     final CodecItem item = stream
         .getOrFirst(streamIndex)
@@ -240,9 +241,9 @@ class LiveRoomController extends GetxController
         .getOrFirst(codecIndex);
     acceptQnList = item.acceptQn;
     // 以服务端返回的码率为准
-       if (liveUrlIndex < 0 || liveUrlIndex >= item.urlInfo.length) this.liveUrlIndex = liveUrlIndex = 0;
+       if (targetUrlIdx < 0 || targetUrlIdx >= item.urlInfo.length) this.liveUrlIndex = targetUrlIdx = 0;
       currentQn.value = item.currentQn;
-    videoUrl = VideoUtils.getLiveCdnUrl(item, index: liveUrlIndex);
+    videoUrl = VideoUtils.getLiveCdnUrl(item, index: targetUrlIdx);
     return playerInit()?.whenComplete(_startSizeSub);
   }
 
