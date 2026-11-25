@@ -66,8 +66,23 @@ class HomeController extends GetxController
     final tabs = GStorage.setting.get(SettingBoxKey.tabBarSort) as List?;
     if (tabs != null) {
       this.tabs = tabs.map((i) => HomeTabType.values[i]).toList();
+      if (!GStorage.setting.get('homeFollowTabInited', defaultValue: false)) {
+        GStorage.setting.put('homeFollowTabInited', true);
+        if (!this.tabs.contains(HomeTabType.follow)) {
+          final rcmdIndex = this.tabs.indexOf(HomeTabType.rcmd);
+          if (rcmdIndex != -1) {
+            this.tabs.insert(rcmdIndex + 1, HomeTabType.follow);
+          } else {
+            this.tabs.add(HomeTabType.follow);
+          }
+          GStorage.setting.put(
+            SettingBoxKey.tabBarSort,
+            this.tabs.map((e) => e.index).toList(),
+          );
+        }
+      }
     } else {
-      this.tabs = HomeTabType.values;
+      this.tabs = const [HomeTabType.live, HomeTabType.rcmd, HomeTabType.follow, HomeTabType.hot, HomeTabType.rank, HomeTabType.bangumi, HomeTabType.cinema];
     }
 
     tabController = TabController(
