@@ -12,8 +12,10 @@ import 'package:PiliPlus/pages/search/controller.dart';
 import 'package:PiliPlus/pages/search/widgets/hot_keyword.dart';
 import 'package:PiliPlus/pages/search/widgets/search_text.dart';
 import 'package:PiliPlus/utils/em.dart' show Em;
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/storage.dart';
 import 'package:PiliPlus/utils/storage_key.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:PiliPlus/utils/utils.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
@@ -85,7 +87,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   PreferredSizeWidget get _buildAppBar => AppBar(
-    shape: Border(
+    shape: (NeuStyle.enabled || Pref.modernCardUi) ? null : Border(
       bottom: BorderSide(
         color: theme.dividerColor.withValues(alpha: 0.08),
         width: 1,
@@ -115,7 +117,7 @@ class _SearchPageState extends State<SearchPage> {
       ),
       const SizedBox(width: 10),
     ],
-    title: TextField(
+    title:Container(height: 40, padding: const EdgeInsets.symmetric(horizontal: 12), decoration: NeuStyle.enabled ? NeuStyle.inset(isDark: theme.brightness == Brightness.dark, radius: 20) : (Pref.modernCardUi ? BoxDecoration(color: theme.brightness == Brightness.dark ? theme.colorScheme.surfaceContainerHigh : Colors.white, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: theme.brightness == Brightness.dark ? 0.2 : 0.04), blurRadius: 8, offset: const Offset(0, 2))]) : null), alignment: Alignment.center, child:  TextField(
       autofocus: true,
       focusNode: _searchController.searchFocusNode,
       controller: _searchController.controller,
@@ -127,7 +129,7 @@ class _SearchPageState extends State<SearchPage> {
         border: InputBorder.none,
       ),
       onSubmitted: (value) => _searchController.submit(),
-    ),
+    )),
   );
 
   Widget _buildSearchSuggest() {
