@@ -173,7 +173,7 @@ class LiveRoomController extends GetxController
       stream = playurl.stream;
       _initStreamIndex();
       await Future.wait([
-        ?(
+        ?initLiveUrl(
           streamIndex: streamIndex,
           formatIndex: formatIndex,
           codecIndex: codecIndex,
