@@ -20,9 +20,12 @@ import 'package:PiliPlus/pages/video/introduction/pgc/widgets/episode.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/widgets/season.dart';
 import 'package:PiliPlus/pages/video/introduction/pgc/widgets/section.dart';
 import 'package:PiliPlus/pages/video/introduction/ugc/widgets/action_item.dart';
+import 'package:PiliPlus/pages/video/widgets/audio_extract_sheet.dart';
 import 'package:PiliPlus/utils/extension/get_ext.dart';
+import 'package:PiliPlus/utils/neu_style.dart';
 import 'package:PiliPlus/utils/num_utils.dart';
 import 'package:PiliPlus/utils/page_utils.dart';
+import 'package:PiliPlus/utils/storage_pref.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:material_ui/material_ui.dart';
@@ -404,6 +407,7 @@ class _PgcIntroPageState extends State<PgcIntroPage> {
   }
 
   Widget actionGrid(PgcStat stat, PgcIntroController introController) {
+     final useModernIcons = Pref.modernCardUi || NeuStyle.enabled;
     return SizedBox(
       height: 48,
       child: Row(
@@ -412,8 +416,8 @@ class _PgcIntroPageState extends State<PgcIntroPage> {
           Obx(
             () => ActionItem(
               animation: introController.tripleAnimation,
-              icon: const Icon(FontAwesomeIcons.thumbsUp),
-              selectIcon: const Icon(FontAwesomeIcons.solidThumbsUp),
+              icon: Icon(useModernIcons ? Icons.thumb_up_outlined : FontAwesomeIcons.thumbsUp),
+              selectIcon: Icon(useModernIcons ? Icons.thumb_up_rounded : FontAwesomeIcons.solidThumbsUp),
               selectStatus: introController.hasLike.value,
               semanticsLabel: '点赞',
               text: NumUtils.numFormat(stat.like),
@@ -424,8 +428,8 @@ class _PgcIntroPageState extends State<PgcIntroPage> {
           Obx(
             () => ActionItem(
               animation: introController.tripleAnimation,
-              icon: const Icon(FontAwesomeIcons.b),
-              selectIcon: const Icon(FontAwesomeIcons.b),
+              icon: Icon(useModernIcons ? Icons.monetization_on_outlined : FontAwesomeIcons.b),
+              selectIcon: Icon(useModernIcons ? Icons.monetization_on_rounded : FontAwesomeIcons.b),
               onTap: introController.actionCoinVideo,
               selectStatus: introController.hasCoin,
               semanticsLabel: '投币',
@@ -435,8 +439,8 @@ class _PgcIntroPageState extends State<PgcIntroPage> {
           Obx(
             () => ActionItem(
               animation: introController.tripleAnimation,
-              icon: const Icon(FontAwesomeIcons.star),
-              selectIcon: const Icon(FontAwesomeIcons.solidStar),
+              icon: Icon(useModernIcons ? Icons.star_outline_rounded : FontAwesomeIcons.star),
+              selectIcon: Icon(useModernIcons ? Icons.star_rounded : FontAwesomeIcons.solidStar),
               onTap: () => introController.showFavBottomSheet(context),
               onLongPress: () => introController.showFavBottomSheet(
                 context,
@@ -448,15 +452,21 @@ class _PgcIntroPageState extends State<PgcIntroPage> {
             ),
           ),
           ActionItem(
-            icon: const Icon(CustomIcons.download),
+            icon: Icon(useModernIcons ? Icons.download_rounded : CustomIcons.download),
             onTap: () => videoDetailCtr.onDownload(context),
             text: '缓存',
             semanticsLabel: '缓存',
           ),
+           ActionItem(
+             icon: Icon(useModernIcons ? Icons.graphic_eq_rounded : Icons.audiotrack_rounded),
+             onTap: () => AudioExtractSheet.show(context, videoDetailCtr),
+             text: '提取音频',
+             semanticsLabel: '提取音频',
+           ),
           Obx(
             () => ActionItem(
-              icon: const Icon(FontAwesomeIcons.clock),
-              selectIcon: const Icon(FontAwesomeIcons.solidClock),
+              icon: Icon(useModernIcons ? Icons.watch_later_outlined : FontAwesomeIcons.clock),
+              selectIcon: Icon(useModernIcons ? Icons.watch_later_rounded : FontAwesomeIcons.solidClock),
               onTap: () =>
                   introController.handleAction(introController.viewLater),
               selectStatus: introController.hasLater.value,
@@ -465,7 +475,7 @@ class _PgcIntroPageState extends State<PgcIntroPage> {
             ),
           ),
           ActionItem(
-            icon: const Icon(FontAwesomeIcons.shareFromSquare),
+            icon: Icon(useModernIcons ? Icons.share_rounded : FontAwesomeIcons.shareFromSquare),
             onTap: () => introController.actionShareVideo(context),
             selectStatus: false,
             semanticsLabel: '转发',
