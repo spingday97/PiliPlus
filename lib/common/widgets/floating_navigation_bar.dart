@@ -38,7 +38,7 @@ class FloatingNavigationBar extends StatelessWidget {
     this.overlayColor,
     this.labelTextStyle,
     this.labelPadding,
-    this.bottomPadding = 8.0,
+    this.bottomPadding = 14.0,
   }) : assert(destinations.length >= 2),
        assert(0 <= selectedIndex && selectedIndex < destinations.length);
 
@@ -93,7 +93,7 @@ class FloatingNavigationBar extends StatelessWidget {
       elevation ?? navigationBarTheme.elevation ?? defaults.elevation!,
     );
 
-    final isModern = Pref.modernCardUi && !Pref.iosStyleUi; final navHeight = isModern ? 52.0 : _kNavigationHeight; return Padding(
+    final isModern = Pref.modernCardUi && !Pref.iosStyleUi; final navHeight = isModern ? 56.0 : _kNavigationHeight; return Padding(
       padding: .fromLTRB(
         padding.left,
         0,
