@@ -1,5 +1,8 @@
 import 'package:PiliPlus/models/common/enum_with_label.dart';
+import 'package:PiliPlus/models/common/dynamic/dynamics_type.dart';
 import 'package:PiliPlus/pages/common/common_controller.dart';
+import 'package:PiliPlus/pages/dynamics_tab/controller.dart';
+import 'package:PiliPlus/pages/dynamics_tab/view.dart';
 import 'package:PiliPlus/pages/hot/controller.dart';
 import 'package:PiliPlus/pages/hot/view.dart';
 import 'package:PiliPlus/pages/live/controller.dart';
@@ -20,6 +23,7 @@ enum HomeTabType implements EnumWithLabel {
   rank('分区'),
   bangumi('番剧'),
   cinema('影视'),
+  follow('关注'),
   ;
 
   @override
@@ -33,6 +37,7 @@ enum HomeTabType implements EnumWithLabel {
     HomeTabType.rank => Get.find<RankController>,
     HomeTabType.bangumi ||
     HomeTabType.cinema => () => Get.find<PgcController>(tag: name),
+    HomeTabType.follow => () => Get.find<DynamicsTabController>(tag: DynamicsTabType.video.name),
   };
 
   Widget get page => switch (this) {
@@ -41,6 +46,7 @@ enum HomeTabType implements EnumWithLabel {
     HomeTabType.hot => const HotPage(),
     HomeTabType.rank => const RankPage(),
     HomeTabType.bangumi => const PgcPage(tabType: HomeTabType.bangumi),
+    HomeTabType.follow => const DynamicsTabPage(dynamicsType: DynamicsTabType.video),
     HomeTabType.cinema => const PgcPage(tabType: HomeTabType.cinema),
   };
 }
