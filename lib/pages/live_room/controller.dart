@@ -191,7 +191,7 @@ class LiveRoomController extends GetxController
   int streamIndex = 0;
   int formatIndex = 0;
   int codecIndex = 0;
-  int liveUrlIndex = 0;
+  late int liveUrlIndex = Pref.liveUrlIndex;
 
   void _initStreamIndex() {
     final pref = Pref.liveStream;
@@ -230,7 +230,8 @@ class LiveRoomController extends GetxController
     this.formatIndex = formatIndex;
     this.codecIndex = codecIndex;
     this.liveUrlIndex = liveUrlIndex;
-
+    GStorage.setting.put(SettingBoxKey.liveUrlIndex, liveUrlIndex);
+      
     final CodecItem item = stream
         .getOrFirst(streamIndex)
         .format
@@ -239,7 +240,8 @@ class LiveRoomController extends GetxController
         .getOrFirst(codecIndex);
     acceptQnList = item.acceptQn;
     // 以服务端返回的码率为准
-    currentQn.value = item.currentQn;
+       if (liveUrlIndex < 0 || liveUrlIndex >= item.urlInfo.length) this.liveUrlIndex = liveUrlIndex = 0;
+      currentQn.value = item.currentQn;
     videoUrl = VideoUtils.getLiveCdnUrl(item, index: liveUrlIndex);
     return playerInit()?.whenComplete(_startSizeSub);
   }
