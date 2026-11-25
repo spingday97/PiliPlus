@@ -1104,7 +1104,8 @@ _setting.get(SettingBoxKey.appIconAlias, defaultValue: 'LauncherDefault');
       _setting.get(SettingBoxKey.maxVolume, defaultValue: 2.0);
 
   static List? get liveStream => _setting.get(SettingBoxKey.liveStream);
-
+  static int get liveUrlIndex => _setting.get(SettingBoxKey.liveUrlIndex, defaultValue: 0);
+    
   static bool get enableDocProvider =>
       _setting.get(SettingBoxKey.enableDocProvider, defaultValue: false);
 
